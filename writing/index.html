@@ -283,6 +283,8 @@ button:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus
 .prog{height:12px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:#fff;margin:8px 0}
 .prog i{display:block;height:100%;background:repeating-linear-gradient(-45deg,#9DC4F0 0 8px,#C6DCF7 8px 16px);transform-origin:left;transition:transform .3s}
 .ocr-out{width:100%;min-height:180px;font-family:var(--f-text);font-size:16px;line-height:1.7;border:2px solid var(--blue);border-radius:8px;padding:10px;background:#fff;color:var(--ink);resize:vertical}
+#printArea{display:none}
+@media print{body>*:not(#printArea){display:none!important}#printArea{display:block}@page{size:A4;margin:14mm}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 @media (max-width:900px){
@@ -932,6 +934,86 @@ async function runOCR(w){
   PH.busy=false;PH.ctl=null;const g=$('#phGo');if(g){g.disabled=!PH.files.length;g.textContent='다시 바꾸기'}const c=$('#phClose');if(c)c.disabled=false;
 }
 
+/* ============ 출력(인쇄) ============ */
+const PRINT_CSS=`
+.pw,.pw *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pw{font-family:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#222;font-size:12pt;line-height:1.6}
+.pw h1{font-family:'Gaegu','Gowun Dodum',sans-serif;font-size:24pt;margin:0 0 2mm;line-height:1.2}
+.pw h2{font-family:'Gaegu','Gowun Dodum',sans-serif;font-size:16pt;margin:6mm 0 2mm;color:#C8392F}
+.pw .meta{display:flex;justify-content:space-between;gap:6mm;border-bottom:1.5pt solid #222;padding-bottom:2mm;margin-bottom:4mm;font-size:11pt}
+.pw .meta span{flex:1}
+.pw .blank{display:inline-block;min-width:28mm;border-bottom:1pt solid #555}
+.pw .mat{border:1pt solid #999;border-radius:2mm;padding:3mm 4mm;white-space:pre-wrap;font-size:11.5pt;background:#fff}
+.pw .src{font-size:9pt;color:#666;margin-top:1mm}
+.pw ol{margin:0;padding-left:6mm}
+.pw .qline{border-bottom:1pt dashed #999;height:9mm}
+.pw table{width:100%;border-collapse:collapse}
+.pw td,.pw th{border:1pt solid #555;vertical-align:top;padding:2mm 3mm}
+.pw th{width:24mm;font-family:'Gaegu',sans-serif;font-size:13pt;color:#C8392F;text-align:left}
+.pw th small{display:block;color:#666;font-family:'Gowun Dodum',sans-serif;font-size:8.5pt;font-weight:400}
+.pw td{height:20mm;background:repeating-linear-gradient(to bottom,transparent 0 8.5mm,#ccc 8.5mm 8.8mm)}
+.pw .lines{border-left:1.2pt solid #F2A7B5;padding-left:4mm;margin-left:8mm}
+.pw .lines div{height:10mm;border-bottom:.8pt solid #bbb}
+.pw .paper{border-left:1.2pt solid #F2A7B5;padding-left:5mm;margin-left:8mm;white-space:pre-wrap;line-height:10mm;background:repeating-linear-gradient(to bottom,transparent 0 9.7mm,#ccc 9.7mm 10mm);font-size:13pt}
+.pw .tip{font-size:10pt;color:#555;margin:1mm 0}
+.pw .pb{break-before:page;page-break-before:always}
+.pw .box{border:1.5pt solid #222;border-radius:3mm;padding:3mm 4mm;margin-top:4mm}
+.pw .stars{color:#E0A020;font-size:14pt;letter-spacing:1pt}
+.pw .fix s{color:#888}.pw .fix b{color:#C8392F}
+.pw .check span{display:inline-block;width:4mm;height:4mm;border:1pt solid #222;margin-right:2mm;vertical-align:-0.5mm}
+`;
+function worksheetHTML(w){
+  const tp=topicOf(w);const ol=outlineFor(w.type,w.grade);const [a,b]=TARGET[w.grade];
+  const lines=n=>'<div class="lines">'+'<div></div>'.repeat(n)+'</div>';
+  const rows=Math.min(16,Math.max(10,Math.ceil(b/24)));
+  return `<div class="pw">
+    <div class="meta"><span>${w.grade}학년 · ${esc(TYPES[w.type].label)}</span><span>이름: <span class="blank">${esc(DB.name||'')}</span></span><span>날짜: <span class="blank"></span></span></div>
+    <h1>${esc(tp.title)}</h1>
+    <h2>① 읽고 떠올려요</h2>
+    <div class="mat">${esc(tp.body)}</div><div class="src">자료: ${esc(tp.src)}</div>
+    <h2>② 생각 열기</h2>
+    <ol>${tp.think.map(q=>`<li>${esc(q)}<div class="qline"></div></li>`).join('')}</ol>
+    <p class="tip">떠오르는 낱말: ____________________________________________</p>
+    <h2>③ 개요 짜기 · 처음, 가운데, 끝</h2>
+    <table>${ol.map(([k,x,y])=>`<tr><th>${x}<small>${y}</small></th><td></td></tr>`).join('')}</table>
+    <div class="pb"></div>
+    <div class="meta"><span>${esc(tp.title)}</span><span>목표 ${a}~${b}자</span></div>
+    <h2>④ 글쓰기</h2>
+    <p class="tip">제목: ________________________________ · 또박또박 크게 쓰면 사진으로 올릴 때 글자로 잘 바뀌어요.</p>
+    ${lines(rows)}
+    <h2>⑤ 스스로 점검해요</h2>
+    <div class="check">${SELF[w.type].map(([k,q])=>`<div><span></span><b>${k}</b> ${esc(q)}</div>`).join('')}</div>
+  </div>`;
+}
+function finalPrintHTML(w){
+  const tp=topicOf(w);const fb=analyze(w.text,w.grade,w.type);const r=fb.rubric;const st=n=>'★'.repeat(n)+'☆'.repeat(3-n);
+  return `<div class="pw">
+    <div class="meta"><span>${w.grade}학년 · ${esc(TYPES[w.type].label)}</span><span>${esc(DB.name||'')}</span><span>${new Date(w.doneAt||Date.now()).toLocaleDateString('ko-KR')}</span></div>
+    <h1>${esc(w.title||tp.title)}</h1>
+    <p class="tip">글감: ${esc(tp.title)} · ${countChars(w.text)}자${w.firstLen?` (처음 ${w.firstLen}자)`:''}</p>
+    <div class="paper">${esc((w.text||'').trim())}</div>
+    <div class="box">
+      <b>빨간펜 별점</b> 내용 <span class="stars">${st(r.내용)}</span> · 짜임 <span class="stars">${st(r.짜임)}</span> · 표현 <span class="stars">${st(r.표현)}</span>
+      ${fb.good.length?`<div>잘한 점: ${fb.good.map(esc).join(' / ')}</div>`:''}
+      ${fb.fix.length?`<div>다음에 도전할 점: ${esc(fb.fix[0])}</div>`:''}
+      ${fb.errs.length?`<div class="fix">맞춤법: ${fb.errs.map(e=>`<s>${esc(e.from)}</s>→<b>${esc(e.to)}</b>`).join(', ')}</div>`:''}
+    </div>
+    <div class="box" style="min-height:28mm"><b>엄마(선생님)의 한마디</b></div>
+  </div>`;
+}
+function doPrint(html,fileName,title){
+  const inClaude=!!(window.claude&&window.claude.use);
+  if(inClaude){
+    const doc=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(title)}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap"><style>@page{size:A4;margin:14mm}body{margin:0}${PRINT_CSS}</style></head><body onload="setTimeout(function(){window.print()},400)">${html}</body></html>`;
+    saveFile(fileName,doc,'text/html');
+    toast('파일을 열면 바로 인쇄 창이 떠요');return;
+  }
+  let pa=document.getElementById('printArea');
+  if(!pa){pa=document.createElement('div');pa.id='printArea';document.body.appendChild(pa)}
+  pa.innerHTML=`<style>${PRINT_CSS}</style>${html}`;
+  setTimeout(()=>{window.print()},60);
+}
+
 /* ============ 화면 ============ */
 const STEP_NAMES=['생각 열기','질문 만들기','개요 짜기','글쓰기','빨간펜 첨삭','늘리고 완성'];
 let view={screen:'home',id:null,step:0,sel:-1,ask:'',confirmDel:null,aiBusy:false,aiErr:'',exAI:null,exBusy:false,more:false};
@@ -1009,7 +1091,7 @@ function homeHTML(){
     </div></li>`}).join('')}</ul>`:`<div class="empty">${ch('bookie','happy','bob')}<div class="bubble l">아직 쓴 글이 없어.<br>위에서 글감을 하나 골라 봐!</div></div>`}
   <details class="note"><summary>선생님·부모님께</summary>
     <p>글감과 단계는 인천광역시교육청 「생각이 깊어지는 글쓰기」 3·4학년 워크북과 지도서, 3~6학년 서·논술형 평가도구 자료집, 저학년 논술교실 지도 자료, 5학년 독서·논술 자료를 바탕으로 만들었어요. 한 편은 ‘생각 열기 → 질문 만들기(1·2학년은 생각 그물) → 개요 짜기 → 글쓰기 → 빨간펜 첨삭 → 늘리고 완성’ 순서로 진행돼요.</p>
-    <p>타자가 어려운 아이는 ④ 글쓰기에서 공책 사진을 올리면 글자로 바꿔 줘요(아이가 쓴 맞춤법 그대로 옮겨서 첨삭에 쓸 수 있어요). 빨간펜 첨삭은 자주 틀리는 맞춤법·띄어쓰기와 워크북 검토 기준(내용·짜임·표현)을 스스로 살펴 주고, Claude 안에서 열면 AI 선생님 첨삭도 받을 수 있어요. 글은 이 기기의 브라우저에만 저장되니, 다른 기기로 옮기거나 보관할 때는 아래 버튼으로 파일을 저장해 두세요.</p>
+    <p>종이에 쓰고 싶으면 ① 생각 열기나 ④ 글쓰기에서 활동지를 인쇄할 수 있고, 완성한 글도 인쇄할 수 있어요. 타자가 어려운 아이는 ④ 글쓰기에서 공책 사진을 올리면 글자로 바꿔 줘요(아이가 쓴 맞춤법 그대로 옮겨서 첨삭에 쓸 수 있어요). 빨간펜 첨삭은 자주 틀리는 맞춤법·띄어쓰기와 워크북 검토 기준(내용·짜임·표현)을 스스로 살펴 주고, Claude 안에서 열면 AI 선생님 첨삭도 받을 수 있어요. 글은 이 기기의 브라우저에만 저장되니, 다른 기기로 옮기거나 보관할 때는 아래 버튼으로 파일을 저장해 두세요.</p>
     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="backup">모든 글 파일로 저장</button><label class="btn sm" for="restoreIn" style="cursor:pointer">파일에서 불러오기</label><input id="restoreIn" type="file" accept=".json,application/json" class="sr"></div>
     <p id="saveInd" class="save-ind"></p>
   </details>`;
@@ -1096,6 +1178,7 @@ function leftSents(w,tp){
 function r0(w,tp){
   return `<div class="card">${cardTop(w,'생각 열기')}
     ${askRow('bookie','happy','글을 천천히 읽고<br>떠오르는 걸 모아 봐!','bob')}
+    <div class="photo-big" style="border-color:var(--peach-b);background:var(--peach)"><div><b>🖨 종이에 쓰고 싶나요?</b><span>글감·생각 열기·개요 틀·줄공책이 든 활동지를 인쇄해요</span></div><button class="btn sm" data-act="printSheet">활동지 인쇄</button></div>
     <ul class="checks">${tp.think.map(q=>`<li><span class="k">?</span><span>${esc(q)}</span></li>`).join('')}</ul>
     <div class="fld" style="margin-top:14px"><label for="wordIn">떠오르는 낱말 모으기</label>
       <div class="row"><input id="wordIn" type="text" placeholder="낱말 쓰고 ‘넣기’" maxlength="20" style="flex:1;min-width:0;width:auto"><button class="btn sm" data-act="addWord">넣기</button></div>
@@ -1137,7 +1220,7 @@ function r3(w,tp){
   return `<div class="card">${cardTop(w,'글쓰기')}
     ${askRow('mongi','think','개요를 보면서<br>문장으로 써 봐!')}
     ${ol.length?`<div class="ctx"><span class="cl">내 개요</span>${ol.map(([k,a,b])=>`<b>${a}</b> ${esc(w.ol[k])}`).join('<br>')}</div>`:'<p class="ctx"><span class="cl">개요</span>개요가 비어 있어요. ③ 개요 짜기에서 채울 수 있어요.</p>'}
-    <div class="photo-big"><div><b>📷 공책에 썼나요?</b><span>사진을 찍어 올리면 글자로 바꿔 줘요</span></div><button class="btn sm pri" data-act="photo">사진으로 올리기</button></div>
+    <div class="photo-big"><div><b>📷 공책에 썼나요?</b><span>사진을 찍어 올리면 글자로 바꿔 줘요</span></div><button class="btn sm pri" data-act="photo">사진으로 올리기</button><button class="btn sm" data-act="printSheet">활동지 인쇄</button></div>
     <button class="btn sm" data-act="pullOutline">${w.text?'개요를 글 아래에 붙이기':'개요로 글 시작하기'}</button>
     <div class="bank"><h4>문장 도우미</h4><div class="pens">${STARTERS[w.type].map(s=>`<button class="pen sm" data-act="ins" data-v="${esc(s)}">${esc(s)}</button>`).join('')}</div>
     ${(w.words||[]).length?`<h4>모아 둔 낱말</h4><div class="pens">${w.words.map(s=>`<button class="pen sm" data-act="ins" data-v="${esc(s)}">${esc(s)}</button>`).join('')}</div>`:''}</div>
@@ -1215,7 +1298,7 @@ function resultCard(w,tp){
     <p class="growth">늘린 문장 <span class="hl-g tnum"><b>${w.grownN||0}</b>개</span> · 맞춤법 고친 곳 <span class="hl-y tnum"><b>${w.fixedN||0}</b>군데</span></p>
     <ul class="cats">${Object.entries(r).map(([k,v])=>`<li><span>${k}</span><span class="tr"><i class="${v<2?'lo':''}" style="width:${Math.round(v/3*100)}%"></i></span><span class="v tnum">${v}/3</span></li>`).join('')}</ul>
     <div class="momsend">${ch('mongi','happy','bob')}<div><b>엄마에게 글을 보내 볼까?</b><span>제목, 글자 수, 별점, 글 전체가 정리돼요</span></div><button class="btn pri" data-act="mom" data-id="${w.id}">💌 엄마에게 보내기</button></div>
-    <div class="acts"><button class="btn" data-act="home">목록으로</button><button class="btn" data-act="saveTxt">파일로 저장</button>${view.more?'':'<button class="btn" data-act="more">더 고치기</button>'}</div></div>`;
+    <div class="acts"><button class="btn" data-act="home">목록으로</button><button class="btn" data-act="printFinal">🖨 인쇄하기</button><button class="btn" data-act="saveTxt">파일로 저장</button>${view.more?'':'<button class="btn" data-act="more">더 고치기</button>'}</div></div>`;
 }
 function allSents(w){return (w.text||'').split('\n').filter(x=>x.trim()).flatMap(p=>splitSents(p))}
 function updateMeter(){
@@ -1299,6 +1382,8 @@ document.addEventListener('click',ev=>{
     case 'next':goStep(Math.min(5,view.step+1));break;
     case 'prev':goStep(Math.max(0,view.step-1));break;
     case 'photo':openPhoto(w);break;
+    case 'printSheet':doPrint(worksheetHTML(w),`활동지_${topicOf(w).title.slice(0,16)}.html`,topicOf(w).title+' 활동지');break;
+    case 'printFinal':doPrint(finalPrintHTML(w),`${DB.name}_${(w.title||topicOf(w).title).slice(0,16)}_인쇄.html`,w.title||topicOf(w).title);break;
     case 'more':view.more=true;view.sel=-1;render();break;
     case 'addWord':{const i=$('#wordIn');const v=i.value.trim();if(!v)return;w.words=[...(w.words||[]),v];touch(w);render();$('#wordIn').focus();break}
     case 'rmWord':w.words.splice(+b.dataset.i,1);touch(w);render();break;
