@@ -1,0 +1,1235 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>지호의 빨간펜 글쓰기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Gowun+Dodum&display=swap">
+<style>
+/* 「달달맘의 글분석 학습지」와 같은 디자인: 흰 종이 만화 카드 한 가지 모습으로, 배경과 글자색을 모두 직접 지정합니다. */
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --ink:#342A2A; --ink-2:#6C5F5F; --ink-3:#A89B9B;
+  --pink:#F5A3B7; --pink-soft:#FDE7ED; --pink-b:#EE9DB1;
+  --lav:#F6E3F4; --lav-b:#E2A6D7;
+  --lime:#EAF7CB; --peach:#FFF3E6; --peach-b:#F7CDA4;
+  --blue:#4568CF; --blue-soft:#EAF0FC; --coral:#E3544B;
+  --hl:#FFD2DC; --hl-y:#FFE7A3; --hl-g:#D9F0B8;
+  --ok:#3E9B58; --ok-soft:#E8F6DF; --bad:#E3544B; --bad-soft:#FDE9E6;
+  --rule:#EDF0F8; --margin:#F6B7C4; --star:#F5B73C; --line:#E6DCDC;
+  --lh:36px;
+  --f-hand:'Gaegu','Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --f-pen:'Nanum Pen Script','Gaegu','Apple SD Gothic Neo',cursive;
+  --f-text:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{word-break:keep-all;overflow-wrap:anywhere;font-family:var(--f-hand);font-size:19px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--ink)}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:1160px;margin:0 auto;padding-inline:16px;padding-block:18px 56px}
+.tnum{font-variant-numeric:tabular-nums}
+.hl{background:linear-gradient(to bottom,transparent 55%,var(--hl) 55%,var(--hl) 92%,transparent 92%);padding:0 3px}
+.hl-y{background:linear-gradient(to bottom,transparent 55%,var(--hl-y) 55%,var(--hl-y) 92%,transparent 92%);padding:0 3px}
+.hl-g{background:linear-gradient(to bottom,transparent 55%,var(--hl-g) 55%,var(--hl-g) 92%,transparent 92%);padding:0 3px}
+.red{color:var(--coral)} .bl{color:var(--blue)}
+.doodle{font-family:var(--f-pen);color:var(--coral);font-size:24px;line-height:1;display:inline-block;transform:rotate(-8deg);white-space:nowrap;pointer-events:none}
+.chr{display:block;flex:none;width:110px}
+.chr svg{display:block;width:100%;height:auto;overflow:visible}
+.bob{animation:bob 2.6s ease-in-out infinite}
+.hop{animation:hop .5s ease}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes hop{0%{transform:translateY(0) scale(1)}40%{transform:translateY(-10px) scale(1.05)}100%{transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* 말풍선 */
+.bubble{position:relative;background:var(--lime);border:2.5px solid var(--ink);border-radius:46% 54% 48% 52% / 58% 50% 50% 42%;padding:14px 24px;text-align:center;font-weight:700}
+.bubble.l::after{content:'';position:absolute;left:-10px;bottom:22px;width:18px;height:18px;background:inherit;border-left:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:rotate(30deg) skewX(-10deg)}
+.bubble.b::after{content:'';position:absolute;left:34px;bottom:-10px;width:18px;height:18px;background:inherit;border-right:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:rotate(40deg)}
+.bubble.pink{background:var(--pink-soft);border-color:var(--pink-b);border-radius:18px}
+.bubble.pink::after{border-color:var(--pink-b)}
+
+/* ---------- 첫 화면 ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px 24px;align-items:end;padding-block:6px 10px}
+.kicker{font-size:17px;color:var(--ink-2);margin:0}
+.brand{font-family:var(--f-hand);font-weight:700;font-size:clamp(46px,8vw,78px);line-height:1;margin:6px 0 0;letter-spacing:-.02em}
+.brand .red{white-space:nowrap}
+.sub{font-size:21px;margin:12px 0 0;font-weight:700}
+.hero-c{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px}
+.hero-c .pair{display:flex;align-items:flex-end;gap:6px}
+.hero-c .bubble{max-width:260px;font-size:20px}
+.hero-c .d1{position:absolute;right:6px;top:4px}
+.panel{display:flex;flex-wrap:wrap;gap:14px;margin-block:10px 18px}
+.guide{flex:1 1 420px;border:2.5px solid var(--peach-b);border-radius:6px;padding:12px 18px;position:relative;background:#fff}
+.guide h3,.statbox h3{margin:0 0 6px;font-size:21px}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.checks li{display:flex;gap:10px;align-items:center;font-size:20px}
+.cb{width:26px;height:26px;flex:none;position:relative;border:2.5px solid var(--ink);border-radius:3px;background:#fff}
+.cb.on::after{content:'';position:absolute;left:3px;top:-10px;width:12px;height:22px;border-right:4px solid var(--coral);border-bottom:4px solid var(--coral);transform:rotate(40deg);border-radius:2px}
+.checks .k{font-family:var(--f-pen);color:var(--coral);font-size:28px;width:18px;text-align:center;flex:none}
+.statbox{flex:0 1 380px;flex-wrap:wrap;border:2.5px solid var(--lav-b);background:var(--lav);border-radius:6px;padding:12px 18px;display:flex;gap:22px;align-items:center}
+.statbox b{display:block;font-size:40px;line-height:1;white-space:nowrap}
+.statbox span{font-size:17px;color:var(--ink-2);white-space:nowrap}
+.who{display:grid;gap:2px}
+.who label{font-size:17px;color:var(--ink-2)}
+.who input{width:6.5em;font-size:22px;font-weight:700;border:0;border-bottom:2.5px dashed var(--lav-b);background:transparent;padding:0 2px}
+.who input:focus{outline:none;border-bottom-color:var(--coral)}
+.today{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;border:2.5px solid var(--pink-b);background:var(--pink-soft);border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:20px}
+.today.none{border-style:dashed;background:#fff;color:var(--ink-2);font-size:18px}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-block:6px 12px}
+.seg{display:inline-flex;gap:8px;flex-wrap:wrap}
+.seg button{border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:6px 18px;font-size:20px;font-weight:700;transition:transform .12s}
+.seg button[aria-pressed="true"]{background:var(--pink-soft);border-color:var(--coral);color:var(--coral)}
+.seg button:hover{transform:translateY(-2px)}
+.seg button:active{transform:translateY(0)}
+.seg.sm button{font-size:17px;padding:2px 14px;border-width:2px}
+.chk{display:inline-flex;gap:8px;align-items:center;font-size:19px;cursor:pointer;position:relative}
+.chk input{position:absolute;opacity:0;width:1px;height:1px}
+.chk input:focus-visible + .cb{outline:3px solid var(--blue);outline-offset:3px}
+.chk input:checked + .cb::after{content:'';position:absolute;left:3px;top:-10px;width:12px;height:22px;border-right:4px solid var(--coral);border-bottom:4px solid var(--coral);transform:rotate(40deg);border-radius:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.tile{position:relative;display:grid;grid-template-rows:auto auto 1fr auto;gap:4px;text-align:left;background:#fff;border:2.5px solid var(--c,var(--pink-b));border-radius:6px;padding:10px 14px 10px;min-height:170px;transition:transform .15s ease}
+.tile:nth-child(4n+1){--c:var(--pink-b)} .tile:nth-child(4n+2){--c:var(--peach-b)} .tile:nth-child(4n+3){--c:var(--lav-b)} .tile:nth-child(4n+4){--c:#9DC4F0}
+.tile:hover{transform:translateY(-3px) rotate(-.6deg)}
+.tile:active{transform:none}
+.tile .no{display:flex;align-items:center;gap:8px;font-size:34px;font-weight:700;line-height:1}
+.tile .no .circ{display:inline-grid;place-items:center;width:40px;height:40px;border:2.5px solid var(--ink);border-radius:50%;font-size:22px}
+.tile .no small{font-size:16px;color:var(--ink-3);font-weight:400}
+.tile .tt{font-size:21px;font-weight:700;line-height:1.3}
+.tile .snip{font-family:var(--f-text);font-size:14px;line-height:1.55;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile .st{display:flex;align-items:center;justify-content:space-between;font-size:17px;color:var(--ink-3)}
+.tile .new{font-family:var(--f-pen);color:var(--blue);font-size:22px}
+.tile .stamp,.pstamp{position:absolute;right:8px;top:6px;font-family:var(--f-pen);color:var(--coral);font-size:20px;border:2px solid var(--coral);border-radius:50%;width:54px;height:54px;display:grid;place-items:center;line-height:1;transform:rotate(12deg);opacity:.85;text-align:center}
+.tile.custom{cursor:default;border-style:dashed;--c:var(--ink-3)}
+.tile.custom:hover{transform:none}
+.tile.custom input,.tile.custom select{width:100%;border:2px solid var(--line);border-radius:6px;padding:3px 8px;font-family:var(--f-text);font-size:15px;background:#fff}
+.stars{display:inline-flex;gap:1px}
+.stars svg{width:18px;height:18px}
+.shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:30px 0 10px}
+.shelf-h h2{margin:0;font-size:30px}
+.shelf{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.shelf li{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border:2.5px solid var(--line);border-radius:8px;padding:8px 14px;background:#fff}
+.shelf .t{font-size:21px;font-weight:700}
+.shelf .m{font-size:16px;color:var(--ink-2);display:flex;gap:10px;flex-wrap:wrap}
+.shelf .acts{margin:0}
+.ask-del{font-size:17px;color:var(--coral);display:inline-flex;gap:8px;align-items:center}
+.linkbtn{border:0;background:none;padding:0;font-size:17px;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.linkbtn.red{color:var(--coral)}
+.empty{padding:20px 0;display:flex;gap:16px;align-items:center}
+.empty .chr{width:84px}
+.note{margin-top:30px;font-size:18px;border:2.5px dashed var(--peach-b);border-radius:6px;padding:12px 18px;max-width:80ch}
+.note summary{cursor:pointer;font-weight:700}
+.note p{margin:8px 0;font-family:var(--f-text);font-size:15px;line-height:1.7}
+
+/* ---------- 글쓰기 화면 ---------- */
+.shead{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding-block:2px 10px}
+.back{border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:3px 16px 3px 12px;font-size:18px;font-weight:700}
+.back:hover{background:var(--pink-soft)}
+.shead h2{font-size:34px;margin:0;line-height:1.1;display:flex;align-items:center;gap:10px}
+.shead .lv{font-size:17px;color:var(--ink-2);border:2px solid var(--peach-b);background:var(--peach);border-radius:999px;padding:0 12px}
+.shead .sp{flex:1}
+.save-ind{font-size:16px;color:var(--ink-3)}
+.rail-wrap{overflow-x:auto;margin-bottom:22px;scrollbar-width:thin}
+.rail{display:flex;gap:6px;list-style:none;margin:0;padding:2px 2px 6px;min-width:max-content}
+.rail button{font-size:17px;padding:2px 12px;border-radius:999px;border:2px solid #E6DEDE;color:var(--ink-3);white-space:nowrap;display:inline-flex;gap:4px;align-items:center;background:#fff;transition:transform .12s}
+.rail button:hover{transform:translateY(-2px)}
+.rail button.on{border-color:var(--coral);color:var(--coral);background:var(--pink-soft);font-weight:700}
+.rail button.fin{color:var(--ink);border-color:var(--ink-3)}
+.rail button.fin::before{content:'✔';color:var(--coral)}
+.body{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:26px;align-items:start}
+.pcard{background:#fff;border:2.5px solid var(--blue);border-radius:4px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px);display:flex;flex-direction:column}
+.pcard .d2{position:absolute;right:8px;top:-22px;z-index:2}
+.ptools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:2px dashed #C9D5F2;background:var(--blue-soft)}
+.ptools .lab{font-weight:700;font-size:19px;padding-left:4px}
+.pens{display:flex;gap:6px;flex-wrap:wrap}
+.pen{border:2px solid var(--ink);background:#fff;border-radius:8px;padding:1px 10px;font-size:18px;font-weight:700;display:inline-flex;gap:5px;align-items:center;transition:transform .1s}
+.pen .k{font-family:var(--f-pen);color:var(--coral);font-size:26px;line-height:1}
+.pen[aria-pressed="true"]{background:var(--ink);color:#fff}
+.pen[aria-pressed="true"] .k{color:var(--hl-y)}
+.pen:hover:not([aria-pressed="true"]):not([disabled]){transform:translateY(-2px)}
+.pen[disabled]{opacity:.5;cursor:default}
+.pen.sm{font-size:16px;padding:0 8px;border-width:1.5px;font-weight:400}
+.pscroll{overflow:auto;flex:1 1 auto;min-height:0}
+.ptext{position:relative;margin:0;padding:8px 20px 20px 58px;font-family:var(--f-text);font-size:18px;line-height:var(--lh);
+  background-image:linear-gradient(to bottom,transparent calc(var(--lh) - 1.5px),var(--rule) calc(var(--lh) - 1.5px));background-size:100% var(--lh);background-position:0 8px}
+.ptext::before{content:'';position:absolute;top:0;bottom:0;left:46px;border-left:2px solid var(--margin)}
+.para{margin:0;text-indent:1em;position:relative}
+.ptext h4{margin:0;font-family:var(--f-hand);font-size:28px;line-height:var(--lh);text-indent:0}
+.ptext .by{font-family:var(--f-hand);color:var(--ink-2);font-size:17px;margin:0;text-indent:0}
+.pfoot{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:space-between;padding:6px 12px;border-top:2px dashed #C9D5F2;font-size:18px;color:var(--ink-2)}
+.meter{display:flex;gap:14px;flex-wrap:wrap}
+.meter b{color:var(--ink);font-size:22px;margin-left:4px}
+.penhint{font-family:var(--f-pen);color:var(--coral);font-size:22px}
+.draft{display:block;width:100%;min-height:460px;border:0;resize:vertical;font-family:var(--f-text);font-size:18px;line-height:var(--lh);padding:8px 20px 20px 58px;color:var(--ink);background-color:#fff;
+  background-image:linear-gradient(to right,transparent 46px,var(--margin) 46px,var(--margin) 48px,transparent 48px),linear-gradient(to bottom,transparent calc(var(--lh) - 1.5px),var(--rule) calc(var(--lh) - 1.5px));
+  background-size:100% 100%,100% var(--lh);background-position:0 0,0 8px;background-attachment:local}
+.draft:focus{outline:none;box-shadow:inset 0 0 0 3px var(--blue-soft)}
+.marked{--lh:50px}
+.marked ruby{ruby-position:over}
+.marked s{text-decoration:line-through;text-decoration-color:var(--coral);text-decoration-thickness:2px}
+.marked rt{font-family:var(--f-pen);color:var(--coral);font-size:22px;line-height:1}
+.sent{border-radius:2px;cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color .2s}
+.sent:hover{background-color:#FFF6D6}
+.sent.short{text-decoration:underline wavy var(--pink-b);text-underline-offset:6px}
+.sent.grown{background-image:linear-gradient(to bottom,transparent 58%,var(--hl-g) 58%,var(--hl-g) 92%,transparent 92%)}
+.sent.on{background-color:var(--hl-y)}
+
+.side{display:grid;gap:16px}
+.card{position:relative;background:#fff;border:2.5px solid var(--peach-b);border-radius:6px;padding:16px 18px 18px;animation:pop .2s ease}
+.sec{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.sec h3{margin:0;font-size:28px;display:flex;align-items:center;gap:8px;line-height:1.1}
+.circ{display:inline-grid;place-items:center;width:36px;height:36px;border:2.5px solid var(--ink);border-radius:50%;font-size:22px;flex:none}
+.cnt{font-size:18px;color:#fff;background:#8B8080;border-radius:999px;padding:0 12px;white-space:nowrap}
+.qbar{height:10px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;margin-bottom:14px;background:#fff}
+.qbar i{display:block;height:100%;background:repeating-linear-gradient(-45deg,var(--pink) 0 8px,#F9BCCB 8px 16px);transform-origin:left;transition:transform .3s ease}
+.ask{display:flex;gap:6px;align-items:flex-end;margin:0 0 12px}
+.ask .chr{width:84px}
+.ask .bubble{flex:1;font-size:21px;line-height:1.45;text-align:left;margin-left:12px;border-radius:26px;padding:12px 18px}
+.ctx{font-family:var(--f-text);font-size:16px;line-height:1.8;background:var(--peach);border:2px dashed var(--peach-b);border-radius:6px;padding:8px 14px;margin:0 0 12px}
+.ctx .cl{display:block;font-family:var(--f-pen);font-size:22px;color:var(--coral);line-height:1.1}
+.fld{display:grid;gap:4px;margin-bottom:12px}
+.fld label,.fld .lb{font-size:19px;font-weight:700}
+.fld .hint2{font-family:var(--f-text);font-size:14px;color:var(--ink-2)}
+.fld input[type=text],.fld textarea{width:100%;font-family:var(--f-text);font-size:16px;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:8px 10px;background:var(--peach);resize:vertical}
+.fld input[type=text]:focus,.fld textarea:focus{outline:none;border-style:solid;border-color:var(--coral);background:#fff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wchip{display:inline-flex;align-items:center;gap:4px;background:var(--pink-soft);border:2px solid var(--pink-b);border-radius:999px;padding:0 4px 0 12px;font-size:18px;font-weight:700}
+.wchip button{border:0;background:none;color:var(--coral);font-size:20px;line-height:1;padding:0 6px}
+.qitem{border:2px solid #E4DADA;border-radius:8px;padding:10px 14px;display:grid;gap:6px;transition:border-color .15s}
+.qitem:focus-within{border-color:var(--ink)}
+.qitem.pick{border-color:var(--coral);background:var(--pink-soft)}
+.qitem .qt{font-size:20px;font-weight:700;display:flex;gap:8px;align-items:center}
+.qitem .qt .circ{width:28px;height:28px;font-size:16px}
+.qitem .ex{font-family:var(--f-text);font-size:14px;color:var(--ink-2);line-height:1.6}
+.qitem input[type=text]{width:100%;font-family:var(--f-text);font-size:16px;border:0;border-bottom:2px dashed var(--peach-b);background:transparent;padding:2px 2px}
+.qitem input[type=text]:focus{outline:none;border-bottom-color:var(--coral)}
+.qitem .chk{font-size:17px}
+.qitem .chk .cb{width:22px;height:22px}
+.outline{display:grid;gap:12px}
+.oblk{display:grid;grid-template-columns:4.6em minmax(0,1fr);gap:10px;align-items:start}
+.oblk .ol{font-size:22px;font-weight:700;color:var(--coral);line-height:1.1;padding-top:6px}
+.oblk .ol small{display:block;font-size:15px;color:var(--ink-2);font-weight:400}
+.oblk .fld{margin:0}
+.opts{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.fix{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border:2px solid #E4DADA;border-radius:8px;padding:8px 12px;font-size:20px;font-weight:700}
+.fix s{text-decoration-color:var(--coral);text-decoration-thickness:2px;color:var(--ink-2)}
+.fix .to{color:var(--coral)}
+.fix .why{display:block;font-family:var(--f-text);font-size:14px;color:var(--ink-2);font-weight:400}
+.optbtn{width:100%;text-align:left;border:2px solid #E4DADA;background:#fff;border-radius:8px;padding:8px 14px;font-size:20px;font-weight:700;line-height:1.4;transition:border-color .15s,transform .1s}
+.optbtn:hover{border-color:var(--ink);transform:translateX(3px)}
+.optbtn .sub{display:block;font-family:var(--f-text);font-size:14px;color:var(--ink-2);font-weight:400}
+.fb{margin-top:14px;display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:10px 14px;animation:pop .25s ease}
+.fb.ok{background:var(--pink-soft);border:2.5px solid var(--pink-b)}
+.fb.no{background:var(--lav);border:2.5px solid var(--lav-b)}
+.fb .chr{width:70px;margin-top:-4px}
+.fb h4{margin:0;font-size:26px;line-height:1.2}
+.fb.ok h4{color:var(--coral)} .fb.no h4{color:#8A4E8C}
+.fb ul{margin:4px 0 0;padding-left:18px;font-family:var(--f-text);font-size:15.5px;line-height:1.7}
+.acts{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
+.acts.sp{justify-content:space-between}
+.btn{border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:5px 20px;font-size:21px;font-weight:700;transition:transform .12s;display:inline-block;text-decoration:none;color:var(--ink)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:none}
+.btn[disabled]{opacity:.5;cursor:default;transform:none}
+.btn.pri{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn.sm{font-size:18px;padding:2px 14px;border-width:2px}
+.hint{font-family:var(--f-pen);font-size:22px;color:var(--ink-2);margin:8px 0 0;text-align:right}
+.hintline{font-family:var(--f-pen);font-size:24px;color:var(--coral);line-height:1.2;min-height:1.2em;margin:4px 0 8px}
+.score{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.score .big{font-size:84px;font-weight:700;line-height:.9}
+.score .big small{font-size:34px;color:var(--ink-3)}
+.bigstars svg{width:40px;height:40px}
+.resrow{display:flex;gap:6px;align-items:flex-end;margin-top:8px}
+.resrow .chr{width:92px}
+.resrow .bubble{flex:1;margin-left:12px;font-size:20px;text-align:left}
+.cats{display:grid;gap:6px;margin:12px 0 0;padding:0;list-style:none}
+.cats li{display:grid;grid-template-columns:3.2em 1fr 2.6em;gap:10px;align-items:center;font-size:20px}
+.cats .tr{height:14px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:#fff}
+.cats .tr i{display:block;height:100%;background:var(--pink)}
+.cats .tr i.lo{background:#C9B6E8}
+.cats .v{text-align:right}
+.timer{display:grid;gap:8px;margin-top:14px;padding:10px 14px;border:2.5px solid var(--lav-b);background:var(--lav);border-radius:6px}
+.timer h4{margin:0;font-size:23px}
+.timer p{margin:0;font-family:var(--f-text);font-size:15px;line-height:1.7}
+.thinking{font-family:var(--f-pen);font-size:26px;color:var(--coral)}
+.momsend{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:16px;padding:10px 14px;border:2.5px solid var(--pink-b);background:var(--pink-soft);border-radius:10px}
+.momsend .chr{width:62px}
+.momsend > div{flex:1 1 180px;display:grid}
+.momsend b{font-size:22px} .momsend span{font-size:17px;color:var(--ink-2)}
+.bank h4{margin:10px 0 4px;font-size:17px;color:var(--ink-2)}
+.growth{font-size:19px;margin-top:10px}
+
+/* 엄마에게 보내기 창 */
+.send-back{position:fixed;inset:0;z-index:50;background:rgba(52,42,42,.35);display:grid;place-items:center;padding:16px;animation:pop .15s ease}
+.send{width:min(520px,100%);max-height:calc(100% - 8px);overflow:auto;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:16px 18px 18px}
+.send-top{display:flex;align-items:flex-end;gap:6px;margin-bottom:10px}
+.send-top .chr{width:80px}
+.send-top .bubble{flex:1;margin-left:12px;font-size:22px}
+.send-steps{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:4px;font-size:19px}
+.send-steps li{display:flex;align-items:center;gap:8px}
+.send-steps .circ{width:28px;height:28px;font-size:17px}
+.send textarea{width:100%;font-family:var(--f-text);font-size:14.5px;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:10px;background:var(--peach);color:var(--ink);resize:vertical}
+.send-msg{min-height:1.4em;margin:6px 0 0;color:var(--coral);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;border:2.5px solid var(--ink);border-radius:999px;padding:6px 20px;font-size:20px;font-weight:700;z-index:60;animation:pop .2s ease;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+@media (max-width:900px){
+  .statbox{flex-basis:100%}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero-c{flex-direction:row;justify-content:center;align-items:flex-end}
+  .hero-c .chr{width:84px}
+  .hero-c .bubble{font-size:18px;padding:10px 16px}
+  .brand{font-size:44px}
+  .body{grid-template-columns:minmax(0,1fr);gap:18px}
+  .pcard{position:relative;top:0;max-height:none}
+  .pcard.mat .pscroll{max-height:42vh}
+  .ptext{padding-left:50px;padding-right:14px;font-size:17px;--lh:34px}
+  .ptext::before{left:40px}
+  .marked{--lh:48px}
+  .draft{padding-left:50px;padding-right:14px;font-size:17px;--lh:34px;min-height:360px;background-image:linear-gradient(to right,transparent 40px,var(--margin) 40px,var(--margin) 42px,transparent 42px),linear-gradient(to bottom,transparent calc(var(--lh) - 1.5px),var(--rule) calc(var(--lh) - 1.5px))}
+  .ask .chr{width:64px}
+  .ask .bubble{font-size:19px}
+  .pcard .d2{display:none}
+  .oblk{grid-template-columns:minmax(0,1fr)}
+  .oblk .ol{padding-top:0}
+  .score .big{font-size:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+
+<script>
+/* ============ 데이터: 올려주신 자료(인천 「생각이 깊어지는 글쓰기」 3·4학년 워크북·지도서, 서·논술형 평가도구, 저학년 논술교실, 5학년 논술 자료, 동화 글감)를 바탕으로 구성 ============ */
+const TYPES={
+  exp:{label:'겪은 일',cls:''},
+  op:{label:'의견 글',cls:'op'},
+  imag:{label:'상상 글',cls:''},
+  letter:{label:'편지',cls:''},
+  expl:{label:'설명 글',cls:''},
+  book:{label:'독서 감상',cls:''}
+};
+const TARGET={1:[60,150],2:[120,260],3:[250,450],4:[350,600],5:[500,850],6:[650,1100]};
+
+const TOPICS=[
+ // 1학년 — 저학년 동화 글감
+ {id:'1a',g:1,type:'exp',title:'혼자여서 무서웠던 날',src:'동화 「곰돌이 이야기」',
+  body:'곰돌이가 처음으로 혼자서 자는 날이에요.\n“곰돌아, 혼자서 잘 수 있겠니?” “네, 엄마. 걱정 마세요.”\n그런데 ‘위잉위잉’ 바람이 창문을 흔들자 곰돌이는 무서웠어요.\n“우리 곰돌이는 참 씩씩하구나!” 아빠 말씀을 듣고 곰돌이는 얼른 제 방으로 돌아왔어요.\n“나는 씩씩한 곰돌이야.” 곰돌이는 코코 잠이 들었답니다.',
+  think:['곰돌이처럼 혼자여서 무서웠던 일이 있었나요?','언제, 무슨 일 때문이었나요?','무서움을 어떻게 이겨 냈나요?']},
+ {id:'1b',g:1,type:'expl',title:'내 친구의 모습을 소개해요',src:'동화 「모양나라 친구들」',
+  body:'동그라미가 세모 나라에 갇혔을 때 세모 친구가 구해 주었어요.\n“넌 동글동글 이상하게 생겼다.” “너도 뾰족뾰족 이상하게 생겼다.”\n둘은 친구가 되었고, 넙적넙적 네모도 만났어요.\n동그라미, 세모, 네모는 모두 친구가 되어 모양 나라를 세웠답니다.',
+  think:['친구들의 모습은 다 달라요. 내 친구는 어떻게 생겼나요?','키, 얼굴, 눈, 코, 입, 머리 모양을 떠올려 봐요.','그 친구의 좋은 점은 무엇인가요?']},
+ {id:'1c',g:1,type:'exp',title:'내가 누군가를 도와준 날',src:'동화 「영희의 실내화」',
+  body:'모두가 집으로 돌아간 유치원에서 훌쩍훌쩍 우는 소리가 들렸어요.\n영희의 실내화 한 짝이 바닥에 떨어져 울고 있었어요.\n나비는 ‘팔락팔락’ 선생님께 날아가 신발장으로 안내했어요.\n방글방글 웃는 실내화를 보며 나비는 무척 기뻤답니다.',
+  think:['나비처럼 누구를 도와준 일이 있었나요?','도와준 뒤에 마음이 어땠나요?']},
+ {id:'1d',g:1,type:'op',title:'놀이터에서는 차례를 지켜요',src:'동화 「그네와 파리」',
+  body:'나비들이 즐겁게 그네를 타고 있었어요.\n그때 파리가 날아와 “비켜! 내가 먼저 탈 거야.” 하고 올라탔어요.\n그네는 ‘뚝’ 멈춰 섰어요.\n“파리야, 줄을 서면 밀어 줄게.” 산들바람의 말에 파리는 얼른 뒤로 물러섰어요.',
+  think:['재미있게 놀고 있는데 누가 방해해서 속상했던 적이 있나요?','차례를 지키면 무엇이 좋을까요?']},
+ {id:'1e',g:1,type:'exp',title:'내 물건을 아껴요',src:'동화 「아이쿠 아야야」',
+  body:'아름이는 신발도 책도 아무 데나 던졌어요.\n“아이쿠!” 신발이 소리쳤어요. “아야야!” 책도 아파했어요.\n화가 난 장난감들이 몰려오자 아름이는 “잘못했어, 다시는 안 그럴게.” 했어요.\n잠에서 깬 아름이는 얼른 장난감을 정리했답니다.',
+  think:['물건을 아무 데나 두었다가 곤란했던 적이 있나요?','내 물건을 아끼려면 어떻게 해야 할까요?']},
+ {id:'1f',g:1,type:'expl',title:'나를 소개해요',src:'저학년 논술교실 「자기소개서 쓰기」',
+  body:'친구들 앞에서 나를 소개하는 글을 써 봐요.\n이름, 좋아하는 것, 잘하는 것, 꿈을 차례대로 써 보면 좋아요.',
+  think:['내 이름은 무엇이고, 누가 지어 주었나요?','내가 좋아하는 것과 잘하는 것은?','나의 꿈은 무엇인가요?']},
+ {id:'1g',g:1,type:'letter',title:'부모님께 편지 쓰기',src:'저학년 논술교실 「편지쓰기」',
+  body:'고마운 마음, 미안한 마음, 하고 싶은 말을 편지로 전해 봐요.\n편지는 ‘받는 사람 → 첫인사 → 하고 싶은 말 → 끝인사 → 날짜와 쓴 사람’ 차례로 써요.',
+  think:['부모님께 가장 고마웠던 일은?','부모님께 꼭 하고 싶은 말은?']},
+ // 2학년
+ {id:'2a',g:2,type:'exp',title:'창피했던 일, 친구를 놀린 일',src:'동화 「무지개 물고기」 (논술교실 독서 글감)',
+  body:'바다에서 가장 아름다운 비늘을 가진 물고기가 있었어요.\n다른 물고기들이 비늘 하나만 달라고 해도 물고기는 거절하고 뽐내기만 했어요.\n결국 아무도 함께 놀아 주지 않자 물고기는 외로워졌어요.\n반짝이 비늘을 하나씩 나누어 주자, 물고기는 친구들과 함께 행복해졌어요.',
+  think:['나만 잘난 척하다가 창피했던 적이 있나요?','친구를 놀려서 친구가 속상했던 적은 없었나요?','그 뒤에 어떻게 했나요?']},
+ {id:'2b',g:2,type:'exp',title:'해야 할 일을 미룬 날',src:'옛이야기 「아기 돼지 삼 형제」',
+  body:'첫째 돼지는 지푸라기로, 둘째 돼지는 나무로 대충 집을 지었어요.\n막내 돼지는 힘들어도 벽돌을 한 장 한 장 쌓아 튼튼한 집을 지었어요.\n늑대가 “후우!” 불자 지푸라기 집과 나무 집은 날아가 버렸지만,\n벽돌집은 끄떡없었어요.',
+  think:['해야 할 일을 하지 않고 미룬 적이 있나요?','그래서 어떤 일이 생겼나요?','다음에는 어떻게 하고 싶나요?']},
+ {id:'2c',g:2,type:'imag',title:'개미와 베짱이, 그다음 이야기',src:'이솝 이야기 「개미와 베짱이」',
+  body:'여름 내내 개미는 땀 흘려 먹이를 모았고, 베짱이는 노래만 불렀어요.\n추운 겨울이 오자 베짱이는 배가 고파 개미네 집 문을 두드렸어요.\n“똑똑, 개미야. 먹을 것 좀 나누어 줄 수 있니?”',
+  think:['개미는 문을 열어 주었을까요?','베짱이는 그 뒤에 어떻게 바뀌었을까요?','내가 이야기 뒷부분을 지어 본다면?']},
+ {id:'2d',g:2,type:'op',title:'선비가 구렁이를 쏜 것은 옳았을까?',src:'옛이야기 「은혜 갚은 까치」',
+  body:'산길을 가던 선비는 구렁이가 까치 둥지를 노리는 것을 보았어요.\n선비는 활을 쏘아 구렁이를 물리치고 아기 까치들을 구했어요.\n그날 밤, 구렁이의 짝이 나타나 선비를 해치려 했지만\n까치들이 몸을 던져 종을 울려 선비를 구해 주었답니다.',
+  think:['선비가 까치를 구한 것은 잘한 일일까요?','구렁이 입장에서 생각하면 어떨까요?','나라면 어떻게 했을까요?']},
+ {id:'2e',g:2,type:'expl',title:'내가 좋아하는 동물 설명하기',src:'저학년 논술교실 「설명하는 글쓰기」',
+  body:'좋아하는 동물 하나를 정해서, 그 동물을 모르는 친구도 알 수 있게 설명해 봐요.\n생김새, 사는 곳, 먹이, 재미있는 특징을 나누어 쓰면 좋아요.',
+  think:['어떤 동물을 설명하고 싶나요?','생김새는 어떤가요?','그 동물만의 신기한 점은?']},
+ {id:'2f',g:2,type:'imag',title:'토끼와 거북이, 끝부분 바꿔 쓰기',src:'저학년 논술교실 「이야기 끝부분 고쳐 쓰기」',
+  body:'토끼는 느림보 거북이를 놀리며 경주를 하자고 했어요.\n앞서가던 토끼는 “한숨 자고 가도 이기겠지.” 하며 나무 밑에서 잠이 들었어요.\n거북이는 쉬지 않고 엉금엉금 기어갔어요.\n…… 이야기의 끝을 내 마음대로 바꾸어 볼까요?',
+  think:['토끼가 잠에서 깨어났을 때 무슨 일이 생길까요?','두 친구가 함께 결승선에 들어간다면?','내가 바꾼 끝에서 인물들은 무엇을 배울까요?']},
+ {id:'2g',g:2,type:'letter',title:'고마운 분께 편지 쓰기',src:'저학년 논술교실 「편지쓰기」',
+  body:'선생님, 할머니, 친구처럼 고마운 사람에게 편지를 써 봐요.\n고마웠던 일을 자세히 쓰면 마음이 잘 전해져요.',
+  think:['누구에게 고마운가요?','무엇이 고마웠나요? 그때 어떤 일이 있었나요?']},
+ {id:'2h',g:2,type:'exp',title:'가장 기억에 남는 주말',src:'저학년 논술교실 「일기쓰기」',
+  body:'지난 주말 있었던 일 가운데 가장 기억에 남는 일을 골라 일기로 써 봐요.\n있었던 일을 차례대로 쓰고, 그때의 생각과 느낌을 꼭 넣어요.',
+  think:['언제, 어디서, 누구와 있었나요?','무엇을 했나요? 가장 재미있던 순간은?','그때 어떤 기분이었나요?']},
+ // 3학년 — 의견을 제시하는 글 워크북
+ {id:'3a',g:3,type:'op',title:'이웃을 위해 어떤 소음을 줄일 수 있을까?',src:'공익광고 「층간 소음」(2015, 공익광고협의회) · 3학년 워크북 기본1',
+  body:'광고 속 사람들은 아파트에서 쿵쿵 뛰고, 의자를 끌고, 늦은 밤 청소기를 돌려요.\n그 소리들이 모여 아래층에는 커다란 ‘연주’처럼 들려요.\n“나에겐 일상이지만 이웃에겐 소음일 뿐입니다.”',
+  think:['“나에겐 일상이지만 이웃에겐 소음일 뿐입니다.”는 어떤 뜻일까요?','우리 집에서 나는 생활 소음에는 무엇이 있나요?','이웃을 위해 내가 할 수 있는 일은?'],
+  qex:['광고에서 사람들은 어떤 소리를 내고 있나요?','왜 아래층 사람에게는 소음으로 들릴까요?','내가 아파트에 산다면 어떤 소음을 줄일 수 있을까요?','층간 소음을 줄이려면 어떻게 해야 할까요?','밤에 청소기를 돌리는 것은 괜찮을까요?']},
+ {id:'3b',g:3,type:'op',title:'쓸수록 줄어듭니다, 북극곰을 도우려면?',src:'한국방송광고진흥공사 「쓸수록 줄어듭니다」(2016) · 3학년 워크북 기본2',
+  body:'광고 속 북극곰들이 녹아 가는 얼음 대신 종이컵 위에 아슬아슬 올라서 있어요.\n“쓸수록 줄어듭니다.”\n우리가 종이컵을 많이 쓸수록 북극곰의 얼음은 줄어들어요.',
+  think:['북극곰들은 왜 종이컵 위에 올라가 있을까요?','“쓸수록 줄어듭니다”는 무엇이 줄어든다는 뜻일까요?','북극곰을 돕기 위해 내가 할 수 있는 일은?'],
+  qex:['광고 속 북극곰은 어디에 서 있나요?','종이컵을 쓰는 것과 북극곰은 어떤 관계일까요?','나는 하루에 일회용품을 얼마나 쓰나요?','북극곰에게 도움을 줄 수 있는 방법에는 무엇이 있을까요?','일회용 컵을 쓰지 않는 것이 정말 도움이 될까요?']},
+ {id:'3c',g:3,type:'op',title:'토끼와 거북이의 경주는 공정할까?',src:'3학년 워크북 「질문 만들기」 예시',
+  body:'토끼는 달리기가 빠르고, 거북이는 느려요.\n그런데도 둘은 같은 길에서 달리기 경주를 했어요.\n거북이가 이겼지만, 처음부터 공정한 경기였을까요?',
+  think:['공정하다는 것은 무슨 뜻일까요?','거북이가 잘하는 것으로 겨룬다면 어떤 경기가 좋을까요?'],
+  qex:['토끼와 거북이는 어떤 경기를 했나요?','토끼는 왜 자신이 반드시 이긴다고 생각했을까요?','토끼처럼 방심했던 경험이 있나요?','거북처럼 꾸준히 노력하려면 어떻게 해야 할까요?','토끼와 거북이가 경주하는 것은 공정할까요?']},
+ {id:'3d',g:3,type:'op',title:'친구가 잘못했을 때 무조건 감싸 줘야 할까?',src:'3학년 추천도서 『경태의 병아리』 토의 주제',
+  body:'친한 친구가 잘못을 했어요. 다른 친구들이 그 친구를 탓하고 있어요.\n친구니까 무조건 편을 들어 줘야 할까요, 아니면 잘못은 잘못이라고 말해 줘야 할까요?',
+  think:['진짜 친구라면 어떻게 해야 할까요?','내가 잘못했을 때 친구가 어떻게 해 주면 좋을까요?']},
+ {id:'3e',g:3,type:'op',title:'규칙을 어긴 아이는 무조건 벌을 받아야 할까?',src:'3학년 추천도서 『나쁜 어린이표』 토의 주제',
+  body:'교실에서 규칙을 어기면 ‘나쁜 어린이표’를 받아요.\n그런데 사정이 있어서 규칙을 어긴 친구도 똑같이 벌을 받아야 할까요?',
+  think:['규칙은 왜 필요할까요?','벌 말고 다른 방법은 없을까요?']},
+ {id:'3f',g:3,type:'op',title:'반대 의견도 꼭 말해야 할까?',src:'3학년 추천도서 『우리는 반대합니다!』 토의 주제',
+  body:'모둠에서 다들 한 의견에 찬성하는데, 나만 생각이 달라요.\n반대 의견을 말해야 할까요, 아니면 조용히 넘어가는 게 좋을까요?',
+  think:['반대 의견을 말하면 어떤 점이 좋을까요?','예의 바르게 반대하는 방법은?']},
+ {id:'3g',g:3,type:'exp',title:'내가 보고 들은 일을 전해요',src:'서·논술형 평가 탐구질문 「보고 들은 일 쓰기」',
+  body:'최근에 보거나 들은 일 가운데 친구에게 알려 주고 싶은 일을 골라요.\n독자가 잘 이해하도록 언제, 어디서, 무엇을 보고 들었는지 차례대로 써요.',
+  think:['무엇을 보거나 들었나요?','그 일이 왜 기억에 남나요?']},
+ {id:'3h',g:3,type:'book',title:'친구에게 책 추천하기',src:'3학년 워크북 응용(독서편)',
+  body:'최근에 읽은 책 한 권을 친구에게 추천해 봐요.\n“재미있어요.”처럼 막연하게 말하지 말고, 책의 주제나 인상 깊은 장면을 들어 구체적으로 추천해요.',
+  think:['어떤 책인가요? 어떤 이야기인가요?','가장 인상 깊은 장면은?','어떤 친구에게 추천하고 싶나요?']},
+ // 4학년
+ {id:'4a',g:4,type:'op',title:'깨끗한 아파트를 위해 무엇을 할까?',src:'초등학교 국어 4-2(2025) · 4학년 워크북 기본1',
+  body:'4학년 조대웅은 아파트 곳곳에 버려진 플라스틱 컵, 과자 봉지, 휴지를 보고 속상했어요.\n그래서 주민들에게 “일주일에 하루를 정해 산책하며 쓰레기를 줍는 날을 만들자.”고 제안했어요.\n운동도 하고 환경도 깨끗해지고, 쓰레기를 버리지 않는 습관도 생긴다는 까닭이었어요.',
+  think:['이 글은 우리에게 어떤 행동을 부탁하나요?','우리 동네에서 고치고 싶은 문제는 무엇인가요?','내가 제안하고 싶은 해결 방법은?'],
+  qex:['대웅이는 무엇 때문에 속상했나요?','쓰레기 줍는 날을 만들면 왜 좋을까요?','우리 동네에도 비슷한 문제가 있나요?','쓰레기를 줄이려면 어떻게 해야 할까요?','대웅이의 제안은 실천하기 쉬울까요?']},
+ {id:'4b',g:4,type:'op',title:'고운 말을 써야 하는 까닭',src:'광고 「마음의 못」(2022)·「가는 톡이 고와야 오는 톡도 곱지」(2019) · 4학년 워크북 기본2',
+  body:'한 광고는 나쁜 말이 마음에 박히는 ‘못’과 같다고 말해요. 못을 빼도 자국은 남아요.\n또 다른 광고는 “가는 톡이 고와야 오는 톡도 곱지”라며 메신저 대화 예절을 이야기해요.\n“윗글이 맑아야 아랫글이 맑다.”',
+  think:['“윗글이 맑아야 아랫글이 맑다”는 어떤 뜻일까요?','말 때문에 속상했던 적이 있나요?','온라인에서 고운 말을 쓰려면 어떻게 해야 할까요?']},
+ {id:'4c',g:4,type:'op',title:'교실 쓰레기를 줄이는 방법',src:'4학년 워크북 「의견 결정하기」 활동',
+  body:'우리 반 쓰레기통은 매일 꽉 차요. 종이, 우유갑, 과자 봉지가 뒤섞여 있어요.\n우리가 할 수 있는 가장 좋은 방법을 제안하는 글을 써 봐요.',
+  think:['교실에 어떤 쓰레기가 많이 나오나요?','실천할 수 있는 방법인가요?']},
+ {id:'4d',g:4,type:'book',title:'『긴긴밤』, 서로 다른 친구와 함께한다는 것',src:'4학년 추천도서',
+  body:'세상에 마지막 남은 코뿔소가 동물원에서 만난 어린 펭귄과 함께 길을 떠나요.\n서로 다른 두 동물이 보여 주는 우정과 연대에 대한 이야기예요.',
+  think:['나와 아주 다른 친구와 친해진 적이 있나요?','가장 마음에 남는 장면은?']},
+ {id:'4e',g:4,type:'exp',title:'다녀온 곳을 기행문으로',src:'서·논술형 평가 탐구질문 「기행문 쓰기」',
+  body:'여행이나 체험 학습으로 다녀온 곳을 떠올려요.\n기행문은 여정(간 곳), 견문(보고 들은 것), 감상(생각과 느낌)이 드러나게 써요.',
+  think:['어디에 다녀왔나요? 어떤 순서로 갔나요?','무엇을 보고 들었나요?','그곳에서 무엇을 느꼈나요?']},
+ {id:'4f',g:4,type:'expl',title:'우리 동네를 소개합니다',src:'성취기준 [4국03-01] 중심 문장과 뒷받침 문장',
+  body:'중심 문장 하나와, 그것을 자세히 풀어 주는 뒷받침 문장들로 문단을 만들어 우리 동네를 소개해요.',
+  think:['우리 동네의 자랑거리는?','꼭 가 봐야 할 곳과 그 까닭은?']},
+ // 5학년
+ {id:'5a',g:5,type:'op',title:'초등학생의 휴대전화 사용',src:'5학년 독서·논술 「통합논술 1」',
+  body:'많은 초등학생이 휴대전화를 가지고 있어요.\n연락과 안전에 도움이 된다는 의견도 있고, 게임과 영상에 너무 오래 빠진다는 걱정도 있어요.\n초등학생의 휴대전화 사용에 대한 나의 의견을 근거를 들어 써 봐요.',
+  think:['휴대전화가 꼭 필요한 순간은?','휴대전화 때문에 생기는 문제는?','어떤 약속이 있으면 좋을까요?']},
+ {id:'5b',g:5,type:'op',title:'초등학생의 일기장 검사',src:'5학년 독서·논술 「통합논술 2」',
+  body:'학교에서 일기장을 검사하는 것에 대해 의견이 나뉘어요.\n글쓰기 습관을 기를 수 있다는 의견과, 일기는 나만의 비밀이므로 검사하면 안 된다는 의견이 있어요.',
+  think:['일기장 검사의 좋은 점과 아쉬운 점은?','두 의견을 모두 살릴 방법은 없을까요?']},
+ {id:'5c',g:5,type:'expl',title:'종이책과 전자책, 비교해 설명하기',src:'5학년 독서·논술 「비교의 방법으로 설명하는 글」',
+  body:'두 대상의 같은 점과 다른 점을 나란히 놓고 설명하는 글을 써요.\n종이책과 전자책은 어떤 점이 같고, 어떤 점이 다를까요?',
+  think:['둘의 같은 점은?','다른 점(무게, 값, 눈의 피로, 보관)은?']},
+ {id:'5d',g:5,type:'op',title:'급식 잔반을 줄이려면',src:'5학년 독서·논술 「문제와 해결의 짜임」',
+  body:'학교 급식에서 매일 많은 음식이 버려져요.\n문제 상황 → 원인 → 해결 방법의 짜임으로 주장하는 글을 써 봐요.',
+  think:['음식이 남는 까닭은 무엇일까요?','학생, 선생님, 조리사님이 각각 할 수 있는 일은?']},
+ {id:'5e',g:5,type:'exp',title:'내용이 풍부한 일기',src:'5학년 독서·논술 「뼈대에 살 붙이기」',
+  body:'하루 가운데 한 장면을 골라 사진을 찍듯 자세히 써 봐요.\n대화, 흉내 내는 말, 그때의 생각을 넣으면 일기가 풍부해져요.',
+  think:['오늘(또는 최근) 가장 기억에 남는 한 장면은?','그때 누가 무슨 말을 했나요?']},
+ {id:'5f',g:5,type:'op',title:'학교에서 동물을 길러도 될까?',src:'주장과 근거의 짜임으로 주장하는 글',
+  body:'교실에서 햄스터나 물고기를 기르면 생명을 배울 수 있다는 의견이 있어요.\n하지만 방학 동안 돌보기 어렵고, 알레르기가 있는 친구도 있어요.',
+  think:['동물을 기르면 무엇을 배울 수 있을까요?','동물의 입장에서 생각해 보면?']},
+ // 6학년
+ {id:'6a',g:6,type:'op',title:'환경 보전, 지속 가능한 미래를 위한 선택',src:'6학년 1학기 「주장과 근거를 판단해요」 서·논술형 평가',
+  body:'글쓴이는 화석 연료 사용과 플라스틱 쓰레기로 지구가 심각한 환경 위기에 놓였다고 말해요.\n그래서 에너지 절약, 대중교통 이용, 분리배출 같은 개인의 실천과\n탄소 중립 정책, 신재생 에너지, 순환 경제 같은 사회의 노력이 함께 필요하다고 주장해요.\n\n① 글쓴이의 주장을 한 문장으로 정리하고 ② 근거 두 가지를 찾은 뒤\n③ ‘주장이 가치 있고 중요한가? / 근거와 주장이 관련 있는가? / 근거가 주장을 뒷받침하는가?’로 타당성을 판단해 보세요.',
+  think:['글쓴이의 주장은 한 문장으로 무엇인가요?','근거는 주장을 잘 뒷받침하나요?','나는 어떤 실천을 할 수 있나요?']},
+ {id:'6b',g:6,type:'op',title:'AI로 숙제를 해도 될까?',src:'주장과 근거의 타당성 판단하기',
+  body:'AI에게 물어보면 숙제의 답을 금방 얻을 수 있어요.\n모르는 것을 배우는 도구라는 의견과, 스스로 생각하는 힘을 잃는다는 의견이 있어요.',
+  think:['AI를 도구로 잘 쓰는 방법은?','숙제의 목적은 무엇일까요?']},
+ {id:'6c',g:6,type:'op',title:'어린이 보호 구역, 규칙을 더 강하게 해야 할까?',src:'주장하는 글 쓰기',
+  body:'학교 앞 어린이 보호 구역에서는 차가 천천히 달려야 해요.\n그래도 사고가 나기 때문에 규칙을 더 강하게 해야 한다는 의견과, 지금 규칙을 잘 지키는 것이 먼저라는 의견이 있어요.',
+  think:['등굣길에 위험했던 순간이 있었나요?','운전자와 어린이가 각각 지켜야 할 것은?']},
+ {id:'6d',g:6,type:'op',title:'용돈은 스스로 관리해야 할까?',src:'주장하는 글 쓰기',
+  body:'용돈을 스스로 관리하면 경제 습관을 배울 수 있어요.\n하지만 계획 없이 쓰다가 곤란해질 수도 있어요.',
+  think:['용돈을 쓰고 후회한 적이 있나요?','용돈 관리를 잘하는 방법은?']},
+ {id:'6e',g:6,type:'expl',title:'우리 지역 대구를 알리는 글',src:'서·논술형 평가 탐구질문 「매체 자료 활용」',
+  body:'우리 지역을 처음 오는 사람에게 소개하는 글을 써요.\n사진, 지도, 표 같은 매체 자료를 어떻게 넣으면 좋을지도 함께 생각해요.',
+  think:['대구의 자랑거리는 무엇인가요?','어떤 자료(사진, 지도, 표)를 곁들이면 좋을까요?']},
+ {id:'6f',g:6,type:'book',title:'인물의 선택을 평가하는 독서 감상문',src:'4학년 추천도서 『책과 노니는 집』 등',
+  body:'읽은 책 속 인물 한 명을 골라, 그 인물이 한 중요한 선택을 평가해 봐요.\n나라면 어떻게 했을지도 까닭과 함께 써요.',
+  think:['인물은 어떤 상황에서 무엇을 선택했나요?','그 선택은 옳았을까요?']}
+];
+
+/* 개요 틀 — 워크북의 처음·가운데·끝 구조 */
+function outlineFor(type,g){
+  const O={
+   exp:[['c','처음','언제·어디서·누구와','언제, 어디서, 누구와 있었던 일인가요?'],['m1','가운데','있었던 일 ①','먼저 무슨 일이 있었나요?'],['m2','가운데','있었던 일 ②','그다음에는 무슨 일이 있었나요?'],['e','끝','생각·느낌','그때 어떤 생각이나 느낌이 들었나요?']],
+   op:[['c','처음','문제 + 내 의견','어떤 문제가 있나요? 나는 어떻게 생각하나요?'],['m1','가운데','이유 ① + 예','첫 번째 이유와 예시·경험'],['m2','가운데','이유 ② + 예','두 번째 이유와 예시·경험'],['e','끝','의견 다시 말하기','의견을 다시 말하고, 함께 하자고 부탁해요.']],
+   imag:[['c','처음','인물·장소','누가 나오고, 어디서 시작하나요?'],['m1','가운데','벌어진 일','어떤 일이 벌어지나요?'],['m2','가운데','해결','문제는 어떻게 풀리나요?'],['e','끝','마무리','이야기는 어떻게 끝나고, 인물은 무엇을 느낄까요?']],
+   letter:[['c','첫인사','받는 사람','누구에게 쓰나요? 첫인사는?'],['m1','하고 싶은 말','전할 일 ①','가장 하고 싶은 말은?'],['m2','하고 싶은 말','전할 일 ②','그 까닭이나 있었던 일은?'],['e','끝인사','날짜·쓴 사람','끝인사, 날짜, 쓴 사람']],
+   expl:[['c','처음','설명할 대상','무엇을 설명하나요?'],['m1','가운데','특징 ①','첫 번째 특징'],['m2','가운데','특징 ②','두 번째 특징'],['e','끝','정리','설명을 정리하며 마무리해요.']],
+   book:[['c','처음','책 소개','어떤 책인가요? 왜 읽게 되었나요?'],['m1','가운데','인상 깊은 장면','가장 인상 깊은 장면은?'],['m2','가운데','그 까닭 · 나라면','왜 인상 깊었나요? 나라면 어떻게 했을까요?'],['e','끝','배운 점','책을 읽고 새로 생각하거나 배운 점']]
+  };
+  const base=O[type].map(a=>a.slice());
+  if(type==='op'&&g>=5) base.splice(3,0,['m3','가운데','반대 의견과 답','“물론 ~라고 생각하는 사람도 있습니다. 하지만 ~”']);
+  if(g<=1) return base.filter(b=>b[0]!=='m2');
+  return base;
+}
+const STARTERS={
+  exp:['지난 주말에','그때','그래서','그다음에','마지막으로','왜냐하면','나는 ~해서 기뻤다.'],
+  op:['나는 ~라고 생각합니다.','왜냐하면 ~ 때문입니다.','첫째,','둘째,','예를 들어,','그러므로','우리 모두 ~합시다.'],
+  imag:['옛날 옛날에','그런데 갑자기','“~” 하고 말했어요.','그러자','마침내','그 뒤로'],
+  letter:['~에게','안녕하세요?','고맙습니다.','왜냐하면','앞으로는','~ 올림'],
+  expl:['~에 대해 알려 줄게요.','첫째,','또,','예를 들어,','이처럼','생김새는'],
+  book:['내가 읽은 책은','가장 인상 깊은 장면은','왜냐하면','나라면','이 책을 읽고']
+};
+const Q_TYPES=[
+  ['fact','바로 답을 찾는 질문','글에 직접 나와 있는 내용으로 답해요.'],
+  ['why','단서를 모아 답하는 질문','여러 단서를 모아 “왜?”를 생각해요.'],
+  ['me','나와 관련짓는 질문','내 경험이나 상황과 이어 봐요.'],
+  ['how','방법을 생각하는 질문','“~하려면 어떻게 해야 할까요?”'],
+  ['judge','평가하는 질문','“~는 옳을까요? 공정할까요?”']
+];
+const WEB=[['who','누가'],['when','언제'],['where','어디서'],['what','무엇을'],['how','어떻게'],['why','왜']];
+const SELF={
+  op:[['내용','문제 상황과 내 의견이 잘 연결되어 있나요?'],['내용','의견에 알맞은 이유를 들었나요?'],['내용','이유마다 설명이나 예시를 들었나요?'],['짜임','처음·가운데·끝이 잘 드러나나요?'],['표현','맞춤법, 띄어쓰기, 문장 부호를 확인했나요?']],
+  exp:[['내용','언제, 어디서 있었던 일인지 드러나나요?'],['내용','일어난 일을 차례대로 썼나요?'],['내용','생각이나 느낌을 썼나요?'],['짜임','처음·가운데·끝으로 나누었나요?'],['표현','맞춤법과 문장 부호를 확인했나요?']],
+  imag:[['내용','인물과 장소가 드러나나요?'],['내용','이야기가 자연스럽게 이어지나요?'],['짜임','시작·사건·끝이 있나요?'],['표현','대화나 흉내 내는 말을 넣었나요?'],['표현','맞춤법을 확인했나요?']],
+  letter:[['내용','받는 사람과 첫인사를 썼나요?'],['내용','하고 싶은 말을 자세히 썼나요?'],['짜임','끝인사, 날짜, 쓴 사람을 썼나요?'],['표현','높임말을 알맞게 썼나요?'],['표현','맞춤법을 확인했나요?']],
+  expl:[['내용','무엇을 설명하는지 처음에 밝혔나요?'],['내용','특징을 나누어 설명했나요?'],['짜임','처음·가운데·끝이 있나요?'],['표현','읽는 사람이 이해하기 쉬운 낱말을 썼나요?'],['표현','맞춤법을 확인했나요?']],
+  book:[['내용','책 제목과 내용을 소개했나요?'],['내용','인상 깊은 장면과 까닭을 썼나요?'],['내용','나의 생각이나 배운 점을 썼나요?'],['짜임','처음·가운데·끝이 있나요?'],['표현','맞춤법을 확인했나요?']]
+};
+const BANK={
+  '흉내 내는 말':['반짝반짝','살금살금','두근두근','깡충깡충','보글보글','쨍쨍','엉금엉금','싱글벙글','콩닥콩닥','주룩주룩'],
+  '마음을 나타내는 말':['뿌듯했다','설렜다','속상했다','아쉬웠다','신기했다','감동했다','걱정됐다','후련했다','든든했다','미안했다'],
+  '꾸며 주는 말':['무척','아주','조금','가장','살짝','천천히','꼼꼼하게','힘껏'],
+  '이어 주는 말':['그래서','하지만','왜냐하면','예를 들어','게다가','그러므로','그런데','반면에']
+};
+const BANK_HI={'논술 낱말':['근거','타당하다','뿐만 아니라','결과적으로','이를 통해','무엇보다','따라서','한편']};
+const MORE={
+  op:[['반대 의견에 답하기','물론 ~라고 생각하는 사람도 있습니다. 하지만 '],['내 경험을 근거로','제가 직접 겪은 일을 예로 들면, '],['실천 방법 더하기','이를 위해 우리가 할 수 있는 일은 ']],
+  exp:[['대화 넣기','그때 “ ” 하고 말했다. '],['그때 내 마음 자세히','그 순간 내 마음은 '],['다음에 하고 싶은 일','다음에는 ']],
+  imag:[['대화 넣기','“ ” 하고 말했어요. '],['새로운 인물 등장','그때 어디선가 '],['인물의 마음','주인공은 속으로 ']],
+  letter:[['추억 하나 더','예전에 우리가 함께 '],['약속하기','앞으로 저는 '],['안부 묻기','요즘 ']],
+  expl:[['예를 들어 설명','예를 들어, '],['비교하기','~와 비교하면 '],['재미있는 사실','또 신기한 점은 ']],
+  book:[['나라면?','내가 주인공이었다면 '],['비슷한 경험','나도 비슷한 일을 겪은 적이 있다. '],['추천하는 까닭','이 책을 친구에게 추천하는 까닭은 ']]
+};
+
+/* ============ 저장 (기기 저장: 이 기기의 브라우저에 자동 저장) ============ */
+const KEY='jiho-writing-v1';
+function loadDB(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return null}
+let DB=loadDB()||{name:'지호',grade:2,works:[],filter:'all'};
+let storageOK=true;
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(DB));storageOK=true}catch(e){storageOK=false}markSaved()}
+let saveT;function saveSoon(){clearTimeout(saveT);saveT=setTimeout(persist,500)}
+function markSaved(){const el=document.getElementById('saveInd');if(el){el.textContent=storageOK?'이 기기에 저장됨 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'이 브라우저에서는 자동 저장이 안 돼요. 파일로 저장해 주세요.'}}
+
+/* ============ 유틸 ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();return `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const countChars=t=>(t||'').replace(/\s/g,'').length;
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+function topicOf(w){return w.topic||TOPICS.find(t=>t.id===w.topicId)}
+function curWork(){return DB.works.find(w=>w.id===view.id)}
+function splitSents(text){
+  const out=[];const re=/[^.!?\n]+[.!?…"”']*/g;let m;
+  while((m=re.exec(text))){const s=m[0].trim();if(s.length>0)out.push(s)}
+  return out;
+}
+function stars(n){return '<span class="stars" aria-label="별 '+n+'개">'+'★'.repeat(n)+'<span class="off">'+'★'.repeat(3-n)+'</span></span>'}
+
+/* ============ 빨간펜 규칙 첨삭 ============ */
+const SPELL=[
+ [/됬/g,()=> '됐','‘되었’을 줄이면 ‘됐’이에요.'],
+ [/되요/g,()=> '돼요','‘되어요’를 줄이면 ‘돼요’예요.'],
+ [/되서/g,()=> '돼서','‘되어서’를 줄이면 ‘돼서’예요.'],
+ [/않\s?(해|가|먹|좋|했|갔|와|왔|하|놀|씻|쓰|읽|보|봤|돼|되)/g,(m,a)=>'안 '+a,'‘안’은 뒤 낱말을 부정할 때, ‘않’은 ‘-지 않다’로 써요.'],
+ [/안되요/g,()=> '안 돼요','‘안 돼요’처럼 띄어 쓰고 ‘돼’로 써요.'],
+ [/몇\s?일(?=[에은이도을간동\s.,!?]|$)/g,()=> '며칠','날짜 수는 ‘며칠’이 맞아요.'],
+ [/어떻해/g,()=> '어떡해','‘어떻게 해’를 줄이면 ‘어떡해’예요.'],
+ [/웬지/g,()=> '왠지','‘왜인지’를 줄인 말이라 ‘왠지’예요.'],
+ [/왠만/g,()=> '웬만','‘웬만하다’가 맞아요.'],
+ [/왠일/g,()=> '웬일','‘웬일’이 맞아요.'],
+ [/금새/g,()=> '금세','‘금시에’를 줄인 말이라 ‘금세’예요.'],
+ [/(할|갈|줄|볼|올|을|놀|쓸|알|살|탈|울)께(?=[\s.!?,요]|$)/g,(m,a)=>a+'게','‘-ㄹ게’는 ‘게’로 써요.'],
+ [/(할|갈|볼|을|올|줄|놀|쓸|탈)꺼(?=[야예에요다\s.!?]|$)/g,(m,a)=>a+' 거','‘것’을 줄이면 ‘거’이고, 띄어 써요.'],
+ [/(내|너|우리|니)꺼/g,(m,a)=>a+' 거','‘내 거’처럼 띄어 쓰고 ‘거’로 써요.'],
+ [/할려고/g,()=> '하려고','‘하려고’가 맞아요.'],[/갈려고/g,()=> '가려고','‘가려고’가 맞아요.'],[/볼려고/g,()=> '보려고','‘보려고’가 맞아요.'],[/먹을려고/g,()=> '먹으려고','‘먹으려고’가 맞아요.'],[/잘려고/g,()=> '자려고','‘자려고’가 맞아요.'],
+ [/설겆이/g,()=> '설거지','‘설거지’가 표준어예요.'],
+ [/희안/g,()=> '희한','‘희한하다’가 맞아요.'],
+ [/역활/g,()=> '역할','‘역할’이 맞아요.'],
+ [/일부로/g,()=> '일부러','‘일부러’가 맞아요.'],
+ [/오랫만/g,()=> '오랜만','‘오래간만’을 줄여 ‘오랜만’이에요.'],
+ [/(곰곰|깨끗|틈틈|따뜻|반듯|느긋|깊숙|일일)히/g,(m,a)=>a+'이','이 낱말은 ‘-이’로 끝나요.'],
+ [/(솔직|꼼꼼|조용|열심|가만)이(?=[\s,.!?]|$)/g,(m,a)=>a+'히','이 낱말은 ‘-히’로 끝나요.'],
+ [/어의없/g,()=> '어이없','‘어이없다’가 맞아요.'],
+ [/설레임/g,()=> '설렘','‘설레다’의 명사는 ‘설렘’이에요.'],
+ [/궂이/g,()=> '굳이','‘굳이’가 맞아요.'],
+ [/뵈요/g,()=> '봬요','‘뵈어요’를 줄이면 ‘봬요’예요.'],
+ [/같애/g,()=> '같아','‘같아’가 맞아요.'],
+ [/바꼈/g,()=> '바뀌었','‘바뀌었’이 맞아요.'],
+ [/뒤쳐/g,()=> '뒤처','뒤떨어진다는 뜻은 ‘뒤처지다’예요.'],
+ [/읍니다/g,()=> '습니다','‘-습니다’가 맞아요.'],
+ [/(정답을|답을|문제를) 맞췄/g,(m,a)=>a+' 맞혔','정답을 고르는 것은 ‘맞히다’예요.'],
+ [/(할|갈|볼|먹을|읽을|쓸|놀|탈|알|살)수\s?(있|없)/g,(m,a,b)=>a+' 수 '+b,'‘할 수 있다’처럼 ‘수’는 띄어 써요.'],
+ [/(할|갈|볼|올|될|있을|좋을|먹을|많을|클|한|간|본|하는|있는)것/g,(m,a)=>a+' 것','‘것’은 앞말과 띄어 써요.'],
+ [/것같/g,()=> '것 같','‘것 같다’처럼 띄어 써요.']
+];
+function findSpell(text){
+  const hits=[];
+  SPELL.forEach(([re,fn,why])=>{re.lastIndex=0;let m;while((m=re.exec(text))){const to=fn(...m);if(to!==m[0])hits.push({s:m.index,e:m.index+m[0].length,from:m[0],to,why,src:'rule'});if(m[0].length===0)re.lastIndex++}});
+  hits.sort((a,b)=>a.s-b.s);const out=[];let end=-1;
+  hits.forEach(h=>{if(h.s>=end){out.push(h);end=h.e}});return out;
+}
+const RX={
+  feel:/(기뻤|기뻐|슬펐|슬퍼|무서웠|무서워|신났|신나|뿌듯|속상|재미있|재밌|즐거|즐겁|놀랐|놀라|행복|설렜|설레|걱정|아쉬|감동|미안|고마|부끄|창피|화가|화났|좋았|좋아|싫|외로|궁금|든든|후련|신기)/,
+  time:/(어제|오늘|그제|지난|주말|아침|점심|저녁|밤|방학|[0-9]+월|[0-9]+일|요일|날에|때)/,
+  place:/(에서|에 갔|에 가|집|학교|공원|놀이터|교실)/,
+  reason:/(왜냐하면|때문|까닭은|이유는|첫째|둘째|셋째)/g,
+  example:/(예를 들어|예를 들면|예로|처럼|가령)/,
+  opinion:/(생각합니다|생각한다|생각해요|해야|합시다|좋겠|찬성|반대|주장)/,
+  concl:/(그러므로|따라서|이처럼|결론|앞으로|합시다|해요!|바랍니다|부탁)/,
+  dialog:/[“"]/,
+  mimetic:/([가-힣]{2})\1/,
+  greet:/(에게|께|안녕)/, close:/(올림|드림|씀|사랑해|안녕히|[0-9]+월)/
+};
+function analyze(text,g,type){
+  const t=(text||'').trim();const chars=countChars(t);
+  const paras=t.split(/\n+/).filter(p=>p.trim()).length;
+  const sents=splitSents(t);const errs=findSpell(t);
+  const [tmin,tmax]=TARGET[g];
+  const good=[],fix=[];
+  // 길이
+  if(chars>=tmin) good.push(`목표 글자 수(${tmin}자)를 넘겼어요. 끝까지 쓴 힘이 대단해요!`);
+  else fix.push(`목표까지 ${tmin-chars}자 남았어요. 6단계에서 문장을 늘려 봐요.`);
+  // 종류별 내용
+  let content=1;
+  const has=r=>r.test(t);const reasonN=(t.match(RX.reason)||[]).length;
+  if(type==='op'){
+    if(has(RX.opinion)){content++;good.push('내 의견이 분명하게 드러나요.')} else fix.push('“나는 ~라고 생각합니다.”처럼 내 의견을 분명히 써 봐요.');
+    if(reasonN>=2){content++;good.push('‘왜냐하면·첫째·둘째’로 이유를 똑똑하게 밝혔어요!')} else if(reasonN===1){fix.push('이유가 하나예요. 두 번째 이유를 더해 볼까요?')} else fix.push('“왜냐하면 ~ 때문입니다.”로 이유를 써 봐요.');
+    if(g>=3&&!has(RX.example)) fix.push('이유를 뒷받침하는 예시나 경험(“예를 들어,”)을 넣어 봐요.');
+  }else if(type==='exp'){
+    if(has(RX.time)||has(RX.place)){content++;good.push('언제, 어디서 있었던 일인지 잘 알려 주었어요.')} else fix.push('언제, 어디서 있었던 일인지 처음에 써 주세요.');
+    if(has(RX.feel)){content++;good.push('그때의 마음을 솔직하게 썼어요.')} else fix.push('그때 어떤 기분이었는지 마음을 나타내는 말을 넣어 봐요.');
+  }else if(type==='imag'){
+    if(has(RX.dialog)){content++;good.push('인물의 대화를 넣어서 이야기가 생생해요.')} else fix.push('인물이 하는 말(“ ”)을 넣으면 더 생생해져요.');
+    if(has(RX.feel)||sents.length>=5){content++;good.push('이야기가 이어지도록 잘 썼어요.')} else fix.push('인물의 마음이나 벌어진 일을 조금 더 써 봐요.');
+  }else if(type==='letter'){
+    if(has(RX.greet)){content++;good.push('받는 사람과 첫인사가 잘 들어갔어요.')} else fix.push('“○○에게”, “안녕하세요?”로 편지를 시작해 봐요.');
+    if(has(RX.close)){content++;good.push('끝인사까지 잊지 않았어요.')} else fix.push('끝인사와 날짜, 쓴 사람을 써 주세요.');
+  }else if(type==='expl'){
+    if(/(첫째|또|특징|생김새|모양|색|크기|예를 들어|다른 점|같은 점)/.test(t)){content++;good.push('특징을 나누어 설명했어요.')} else fix.push('특징을 “첫째, 둘째”처럼 나누어 설명해 봐요.');
+    if(sents.length>=Math.max(3,g+1)){content++} else fix.push('설명을 한두 문장 더 자세히 써 봐요.');
+  }else if(type==='book'){
+    if(/(장면|부분|때)/.test(t)){content++;good.push('인상 깊은 장면을 골라 썼어요.')} else fix.push('가장 인상 깊은 장면을 하나 골라 써 봐요.');
+    if(reasonN>0||/(배웠|느꼈|깨달|앞으로|나라면)/.test(t)){content++;good.push('책을 읽고 생긴 내 생각을 썼어요.')} else fix.push('왜 인상 깊었는지, 무엇을 배웠는지 써 봐요.');
+  }
+  content=Math.min(3,content);
+  // 짜임
+  let org=1;const needP=g>=3?3:2;
+  if(paras>=needP){org++;good.push('문단을 나누어 읽기 편해요.')} else fix.push(g>=3?'처음·가운데·끝을 줄을 바꾸어 문단으로 나누어 봐요.':'하고 싶은 말이 바뀔 때 줄을 바꿔 봐요.');
+  if(type==='op'?has(RX.concl):sents.length>=3) org++; else if(type==='op') fix.push('끝부분에서 “그러므로”로 의견을 다시 정리해 봐요.');
+  org=Math.min(3,org);
+  // 표현
+  let expr=3;
+  const andN=(t.match(/그리고/g)||[]).length;
+  if(andN>=3){expr--;fix.push(`‘그리고’가 ${andN}번 나왔어요. ‘그래서, 또, 게다가’로 바꿔 보면 글이 매끄러워요.`)}
+  const ends=sents.map(s=>s.replace(/[.!?…"”'\s]+$/,'').slice(-4));
+  const endCount={};ends.forEach(e=>{if(e.length>=3)endCount[e]=(endCount[e]||0)+1});
+  const rep=Object.entries(endCount).find(([k,v])=>v>=3&&!/니다$/.test(k));
+  if(rep){fix.push(`문장 끝이 ‘${rep[0]}’로 ${rep[1]}번 반복돼요. 다른 말로 바꾸어 볼까요?`)}
+  const polite=sents.filter(s=>/(니다|요)[.!?]?$/.test(s.replace(/[”"'\s]+$/,''))).length;
+  const plain=sents.filter(s=>/[^니]다[.!?]?$/.test(s.replace(/[”"'\s]+$/,''))&&!/[“"]/.test(s)).length;
+  if(g>=2&&polite>0&&plain>0&&type!=='imag'){expr--;fix.push('‘~습니다/요’와 ‘~다’를 섞어 썼어요. 한 가지로 맞춰요.')}
+  const longLim=g<=2?45:65;const longS=sents.filter(s=>s.length>longLim);
+  if(longS.length){fix.push(`너무 긴 문장이 ${longS.length}개 있어요. 두 문장으로 나누어 봐요.`)}
+  const noPunct=t.split(/\n+/).filter(p=>p.trim()&&!/[.!?…"”')]\s*$/.test(p.trim())).length;
+  if(noPunct){fix.push('문장 끝에 마침표(.)를 빠뜨린 곳이 있어요.')}
+  if(errs.length>=3)expr--; if(errs.length>=6)expr--;
+  if(errs.length===0&&chars>20) good.push('맞춤법을 꼼꼼하게 지켰어요!');
+  expr=Math.max(1,Math.min(3,expr));
+  const shortN=sents.filter(s=>countChars(s)<(g<=2?8:14)).length;
+  return {chars,paras,sentN:sents.length,shortN,errs,good:good.slice(0,3),fix:fix.slice(0,5),rubric:{내용:content,짜임:org,표현:expr},at:Date.now()};
+}
+
+/* ============ 확장 질문 ============ */
+function expandAsks(s,type){
+  const a=[];
+  if((type==='exp'||type==='imag'||type==='book')&&!RX.time.test(s)) a.push(['언제?','언제였는지 앞에 붙여 봐요. “지난 토요일 오후에,”']);
+  if((type==='exp'||type==='imag')&&!RX.place.test(s)) a.push(['어디서?','어디였는지 넣어 봐요. “놀이터 미끄럼틀 앞에서”']);
+  if(!RX.mimetic.test(s)) a.push(['어떻게?','흉내 내는 말이나 꾸며 주는 말을 넣어 봐요. “살금살금”, “힘껏”']);
+  if(!/(때문|왜냐하면|해서|어서|아서|니까)/.test(s)) a.push(['왜?','까닭을 이어 붙여 봐요. “~ 때문이다.”, “~해서”']);
+  if(!RX.feel.test(s)) a.push(['마음은?','그때 마음을 더해 봐요. “가슴이 두근두근 뛰었다.”']);
+  if((type==='op'||type==='expl')&&!RX.example.test(s)) a.push(['예를 들면?','예를 하나 들어 봐요. “예를 들어, 우리 반에서는 ~”']);
+  if(type==='op') a.push(['그러면 어떻게 될까?','그렇게 하면 어떤 좋은 일이 생기는지 써 봐요.']);
+  return a.slice(0,5);
+}
+
+/* ============ 런타임 능력(AI 첨삭, 파일 저장) ============ */
+let SAMPLE=null,DOWN=null;
+function initCaps(){
+  const c=window.claude;if(!c||!c.use)return;
+  c.use('sample').then(s=>{if(s){SAMPLE=s;render()}}).catch(()=>{});
+  c.use('downloads').then(d=>{DOWN=d}).catch(()=>{});
+}
+async function saveFile(name,content,mime){
+  const blob=new Blob([content],{type:mime+';charset=utf-8'});
+  if(DOWN){try{await DOWN.save({filename:name,data:blob});toast('파일 저장을 요청했어요');return}catch(e){if(e&&e.code==='declined')return}}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('파일로 저장했어요')}catch(e){toast('이 화면에서는 파일 저장이 안 돼요')}
+}
+const AI_ERR={not_granted:'AI 선생님 사용을 허락하지 않았어요.',rate_limited:'잠깐 쉬었다가 다시 눌러 주세요.',cancelled:'멈췄어요.'};
+let aiCtl=null;
+
+/* ============ 캐릭터 (글분석 학습지와 같은 송이·몽이·책돌이) ============ */
+const INK = '#342A2A';
+const SW = 'stroke="' + INK + '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
+function eyes(m, lx, rx, y){
+  if (m === 'oops') return `<path d="M${lx-5} ${y-4} l7 4 l-7 4 M${rx+5} ${y-4} l-7 4 l7 4" fill="none" ${SW}/>`;
+  if (m === 'cheer') return `<path d="M${lx-5} ${y+2} q5 -8 10 0 M${rx-5} ${y+2} q5 -8 10 0" fill="none" ${SW}/>`;
+  const ry = m === 'wow' ? 8 : 6.5, rxx = m === 'wow' ? 6 : 5, dy = m === 'think' ? -2 : 0;
+  return [lx, rx].map(x => `<ellipse cx="${x}" cy="${y + dy}" rx="${rxx}" ry="${ry}" fill="${INK}"/><circle cx="${x + 1.8}" cy="${y + dy - 2.8}" r="2" fill="#fff"/>`).join('');
+}
+function mouth(m, cx, y){
+  if (m === 'wow') return `<ellipse cx="${cx}" cy="${y + 2}" rx="5" ry="6" fill="#E9707F" ${SW}/>`;
+  if (m === 'oops') return `<path d="M${cx-9} ${y+2} q3 -4 6 0 q3 4 6 0 q3 -4 6 0" fill="none" ${SW}/>`;
+  if (m === 'think') return `<path d="M${cx-5} ${y+2} h9" fill="none" ${SW}/>`;
+  if (m === 'cheer') return `<path d="M${cx-8} ${y-1} q8 13 16 0 z" fill="#E9707F" ${SW}/>`;
+  return `<path d="M${cx-7} ${y} q7 8 14 0" fill="none" ${SW}/>`;
+}
+function extras(m){
+  if (m === 'wow' || m === 'cheer') return `<path d="M104 22 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z" fill="#FFD66B" ${SW}/><path d="M14 36 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z" fill="#F5A3B7" stroke="${INK}" stroke-width="2"/>`;
+  if (m === 'oops') return `<path d="M100 40 q6 9 0 13 q-6 -4 0 -13z" fill="#9CC8F2" ${SW}/>`;
+  if (m === 'think') return `<text x="98" y="30" font-family="Gaegu,sans-serif" font-weight="700" font-size="30" fill="${INK}">?</text>`;
+  return '';
+}
+function songi(m = 'happy'){
+  const petals = [0, 60, 120, 180, 240, 300].map(a => { const r = (a - 90) * Math.PI / 180; return `<circle cx="${(60 + 33 * Math.cos(r)).toFixed(1)}" cy="${(62 + 33 * Math.sin(r)).toFixed(1)}" r="19" fill="#FFC6D4" ${SW}/>`; }).join('');
+  const arms = m === 'cheer' ? `<path d="M26 92 q-10 -14 -6 -26" fill="none" ${SW}/><circle cx="20" cy="64" r="6" fill="#FFF3EA" ${SW}/><path d="M94 92 q10 -14 6 -26" fill="none" ${SW}/><circle cx="100" cy="64" r="6" fill="#FFF3EA" ${SW}/>` : '';
+  return `<svg viewBox="0 0 120 124" aria-hidden="true">${arms}
+    <path d="M38 112 q22 14 44 0 l-4 -14 h-36z" fill="#8FB4F0" ${SW}/>
+    ${petals}
+    <circle cx="60" cy="64" r="31" fill="#FFF3EA" ${SW}/>
+    <path d="M44 40 q16 -10 32 0 q-6 8 -16 6 q-10 3 -16 -6z" fill="#FFC6D4" ${SW}/>
+    <path d="M60 22 q2 -10 10 -12 q-2 9 -10 12z" fill="#A6D98A" ${SW}/>
+    ${eyes(m, 48, 72, 64)}
+    <ellipse cx="40" cy="76" rx="6" ry="3.6" fill="#F7A6B8" opacity=".8"/><ellipse cx="80" cy="76" rx="6" ry="3.6" fill="#F7A6B8" opacity=".8"/>
+    ${mouth(m, 60, 77)}${extras(m)}</svg>`;
+}
+function mongi(m = 'happy'){
+  const wing = m === 'cheer' ? `<path d="M26 70 q-16 -10 -12 -26 q12 6 16 20z" fill="#FFE07F" ${SW}/><path d="M94 70 q16 -10 12 -26 q-12 6 -16 20z" fill="#FFE07F" ${SW}/>`
+    : `<path d="M28 74 q-12 4 -10 16 q10 -2 14 -10z" fill="#FFE07F" ${SW}/><path d="M92 74 q12 4 10 16 q-10 -2 -14 -10z" fill="#FFE07F" ${SW}/>`;
+  const pencil = m === 'think' || m === 'happy' ? `<g transform="rotate(28 100 86)"><rect x="94" y="62" width="11" height="36" rx="2" fill="#7FB6F0" ${SW}/><path d="M94 98 l5.5 11 l5.5 -11z" fill="#FFE3C4" ${SW}/><rect x="94" y="57" width="11" height="7" rx="2" fill="#F5A3B7" ${SW}/></g>` : '';
+  return `<svg viewBox="0 0 120 124" aria-hidden="true">
+    <path d="M48 112 v6 M44 118 h8 M72 112 v6 M68 118 h8" fill="none" ${SW}/>
+    ${wing}
+    <ellipse cx="60" cy="74" rx="36" ry="38" fill="#FFE590" ${SW}/>
+    <path d="M54 37 q-4 -12 4 -16 q2 8 2 15 M62 36 q6 -11 14 -8 q-6 5 -10 10" fill="#FFE590" ${SW}/>
+    ${eyes(m, 47, 73, 68)}
+    <path d="M54 80 l6 7 l6 -7z" fill="#F6A13D" ${SW}/>
+    <ellipse cx="38" cy="84" rx="6" ry="3.5" fill="#F7A6B8" opacity=".8"/><ellipse cx="82" cy="84" rx="6" ry="3.5" fill="#F7A6B8" opacity=".8"/>
+    ${m === 'wow' || m === 'oops' || m === 'cheer' ? mouth(m, 60, 92) : ''}${pencil}${extras(m)}</svg>`;
+}
+function bookie(m = 'happy'){
+  return `<svg viewBox="0 0 120 124" aria-hidden="true">
+    <path d="M44 106 l-4 12 M76 106 l4 12" fill="none" ${SW}/>
+    <path d="M60 32 q-24 -12 -48 -4 v72 q24 -8 48 4z" fill="#E5D4F6" ${SW}/>
+    <path d="M60 32 q24 -12 48 -4 v72 q-24 -8 -48 4z" fill="#F3E9FC" ${SW}/>
+    <path d="M22 44 q14 -4 28 2 M22 56 q14 -4 28 2 M70 46 q14 -6 28 -2" fill="none" stroke="#B9A3D6" stroke-width="2" stroke-linecap="round"/>
+    ${eyes(m, 76, 94, 66)}
+    <ellipse cx="72" cy="78" rx="5" ry="3" fill="#F7A6B8" opacity=".8"/><ellipse cx="100" cy="78" rx="5" ry="3" fill="#F7A6B8" opacity=".8"/>
+    ${mouth(m, 85, 78)}${extras(m)}</svg>`;
+}
+const CHAR = { songi, mongi, bookie };
+const ch = (who, mood, cls = '') => `<span class="chr ${cls}">${CHAR[who](mood)}</span>`;
+const starSvg=on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="${on?'var(--star)':'var(--line)'}"/></svg>`;
+const starsHtml=(n,cls='stars')=>`<span class="${cls}" aria-label="별 ${n}개">${[0,1,2].map(i=>starSvg(i<n)).join('')}</span>`;
+const CIRC=['①','②','③','④','⑤','⑥'];
+function hasBatchim(w){const c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return false;return (c-0xAC00)%28!==0}
+function starOf(w){const r=(w.fb&&w.fb.rubric)||analyze(w.text,w.grade,w.type).rubric;return Math.max(1,Math.round((r.내용+r.짜임+r.표현)/3))}
+const dayKey=t=>{const d=new Date(t);return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`};
+
+/* ============ 엄마에게 보내기 ============ */
+function reportText(w){
+  const tp=topicOf(w);const fb=analyze(w.text,w.grade,w.type);
+  const r=fb.rubric;const st=n=>'★'.repeat(n)+'☆'.repeat(3-n);
+  const first=w.firstLen||fb.chars;const now=countChars(w.text);
+  const praise=(w.ai&&w.ai.praise&&w.ai.praise[0])||fb.good[0]||'끝까지 스스로 썼어요.';
+  return `📮 ${DB.name}의 글쓰기 보고서
+날짜: ${today()}
+${w.grade}학년 · ${TYPES[w.type].label} · ${tp.title}
+제목: ${w.title||tp.title}
+${w.done?'상태: 완성했어요 ✅':'상태: '+STEP_NAMES[w.step||0]+' 단계까지 했어요'}
+
+글자 수: 처음 ${first}자 → 지금 ${now}자 (${now-first>=0?'+':''}${now-first})
+빨간펜 별점: 내용 ${st(r.내용)} · 짜임 ${st(r.짜임)} · 표현 ${st(r.표현)}
+맞춤법 고친 곳: ${w.fixedN||0}군데 · 늘린 문장: ${w.grownN||0}개
+칭찬 한마디: ${praise}
+${fb.fix[0]?'다음에 도전할 점: '+fb.fix[0]:''}
+──────────
+${w.title||tp.title}
+
+${(w.text||'').trim()}
+──────────
+엄마의 한마디: `;
+}
+function dayMsg(ws){
+  return `💌 ${DB.name}의 오늘 글쓰기 (${today()})
+오늘 ${ws.length}편을 완성했어요!
+
+`+ws.map((w,i)=>{const tp=topicOf(w);return `${i+1}. ${w.title||tp.title} (${w.grade}학년 · ${TYPES[w.type].label})
+   ${countChars(w.text)}자 · 별 ${'★'.repeat(starOf(w))}${'☆'.repeat(3-starOf(w))} · 늘린 문장 ${w.grownN||0}개
+
+${(w.text||'').trim()}
+`}).join('\n──────────\n')+`
+엄마의 한마디: `;
+}
+function openSend(text,title,fileName){
+  closeModal();
+  const wrap=document.createElement('div');wrap.id='sendDlg';wrap.className='send-back';
+  wrap.innerHTML=`<div class="send" role="dialog" aria-modal="true" aria-labelledby="sendT">
+    <div class="send-top">${ch('songi','cheer')}<div class="bubble l pink" id="sendT">${esc(title)}</div></div>
+    <ol class="send-steps">
+      <li><span class="circ">1</span> <b>복사하기</b>를 눌러요</li>
+      <li><span class="circ">2</span> 카톡에서 엄마 대화방을 열어요</li>
+      <li><span class="circ">3</span> 길게 눌러 <b>붙여넣기</b> → 보내기!</li>
+    </ol>
+    <label class="sr" for="sendTxt">보낼 내용</label>
+    <textarea id="sendTxt" readonly rows="9">${esc(text)}</textarea>
+    <p class="send-msg" id="sendMsg" aria-live="polite"></p>
+    <div class="acts">
+      <button class="btn" id="sendClose">닫기</button>
+      <button class="btn" id="sendFile">파일로 저장</button>
+      <a class="btn" id="sendSms" href="sms:?&body=${encodeURIComponent(text)}">문자로 보내기</a>
+      <button class="btn pri" id="sendCopy">복사하기</button>
+    </div></div>`;
+  $('#layer').appendChild(wrap);
+  const ta=$('#sendTxt'),msg=$('#sendMsg');
+  wrap.addEventListener('click',e=>{if(e.target===wrap)closeModal()});
+  $('#sendClose').onclick=closeModal;
+  $('#sendFile').onclick=()=>saveFile(fileName,text,'text/plain');
+  $('#sendCopy').onclick=()=>{
+    const fallback=()=>{ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);msg.textContent='글이 선택됐어요. 길게 누르거나 Ctrl+C로 복사해 주세요.'};
+    try{navigator.clipboard.writeText(text).then(()=>{msg.textContent='복사했어요! 이제 카톡에 붙여 넣어 엄마에게 보내요 💕';$('#sendCopy').textContent='복사 완료 ✔'},fallback)}catch(e){fallback()}
+  };
+  $('#sendSms').addEventListener('click',()=>{msg.textContent='문자 앱이 열리지 않으면 복사하기를 눌러 주세요.'});
+  $('#sendCopy').focus();
+}
+function sendMom(w){
+  if(!w.text||!w.text.trim()){toast('아직 쓴 글이 없어요');return}
+  openSend(reportText(w),w.done?'완성한 글을 엄마에게 보내자!':'지금까지 쓴 글을 엄마에게 보내자!',`${DB.name}_${(w.title||topicOf(w).title).slice(0,20)}.txt`);
+}
+function closeModal(){$('#layer').innerHTML=''}
+
+/* ============ 화면 ============ */
+const STEP_NAMES=['생각 열기','질문 만들기','개요 짜기','글쓰기','빨간펜 첨삭','늘리고 완성'];
+let view={screen:'home',id:null,step:0,sel:-1,ask:'',confirmDel:null,aiBusy:false,aiErr:'',exAI:null,exBusy:false,more:false};
+
+function render(){
+  $('#app').innerHTML=view.screen==='home'?homeHTML():workHTML();
+  markSaved();
+  if(view.screen==='work'&&view.step===3)updateMeter();
+}
+function homeHTML(){
+  const g=DB.grade,f=DB.filter||'all',nm=esc(DB.name);
+  const done=DB.works.filter(w=>w.done);
+  const starsTotal=done.reduce((a,w)=>a+starOf(w),0);
+  const doneIds=new Set(done.map(w=>w.topicId));
+  const all=TOPICS.filter(t=>t.g===g);
+  const list=all.filter(t=>(f==='all'||t.type===f)&&(!DB.onlyNew||!doneIds.has(t.id)));
+  const typesHere=[...new Set(all.map(t=>t.type))];
+  const todays=done.filter(w=>dayKey(w.doneAt)===dayKey(Date.now()));
+  const works=[...DB.works].sort((a,b)=>b.updated-a.updated);
+  const call=DB.name?`${nm}${hasBatchim(DB.name)?'아':'야'}, `:'';
+  const greet=done.length?`${call}벌써 ${done.length}편이나 썼어!<br>오늘도 하나 써 볼까?`:`안녕 ${nm}! 나는 송이야.<br>같이 글 쓰러 가자!`;
+  return `<header class="hero">
+    <div><p class="kicker">생각이 깊어지는 글쓰기 · 1~6학년 논술</p>
+      <h1 class="brand"><span id="nm">${nm}</span>의 <span class="red hl">빨간펜 글쓰기</span></h1>
+      <p class="sub">생각 열고 → <span class="hl-y">처음·가운데·끝</span>으로 쓰고 → <span class="hl">빨간펜</span>으로 고치고 <span class="hl-g">쑥쑥 늘리기</span>!</p></div>
+    <div class="hero-c"><div class="bubble b">${greet}</div><span class="doodle d1">슥슥~</span>
+      <span class="pair">${ch('mongi','happy','bob')}${ch('songi','cheer')}</span></div>
+  </header>
+  <div class="panel">
+    <div class="guide"><h3>글 쓸 때 이렇게 해!</h3>
+      <ul class="checks">
+        <li><span class="cb on"></span><span class="k">¶</span><span><span class="hl-y">처음·가운데·끝</span>으로 문단을 나눠요</span></li>
+        <li><span class="cb on"></span><span class="k">?</span><span>‘<span class="hl">왜냐하면</span>’으로 까닭을 꼭 써요</span></li>
+        <li><span class="cb on"></span><span class="k">+</span><span>짧은 문장은 <span class="hl-g">언제·어디서·어떻게</span>로 늘려요</span></li>
+      </ul></div>
+    <div class="statbox">
+      <div><b class="tnum">${done.length}<small style="font-size:22px;color:var(--ink-3)">편</small></b><span>완성한 글</span></div>
+      <div><b class="tnum">${starsTotal}</b><span>모은 별 ★</span></div>
+      <div class="who"><label for="kidName">이름</label><input id="kidName" maxlength="10" value="${nm}" placeholder="이름 쓰기" autocomplete="off" data-inp="name"></div>
+    </div>
+  </div>
+  <div class="today${todays.length?'':' none'}">
+    ${todays.length?`<span>오늘 <b class="tnum">${todays.length}</b>편 완성했어! (${todays.reduce((a,w)=>a+countChars(w.text),0)}자)</span><button class="btn pri" data-act="todayMom">💌 오늘 쓴 글 엄마에게 보내기</button>`:`<span>오늘 완성한 글이 생기면 여기서 한꺼번에 엄마에게 보낼 수 있어요.</span>`}
+  </div>
+  <div class="bar">
+    <div class="seg" role="group" aria-label="학년 선택">${[1,2,3,4,5,6].map(n=>`<button data-act="grade" data-g="${n}" aria-pressed="${g===n}">${n}학년</button>`).join('')}</div>
+    <label class="chk"><input type="checkbox" id="onlyNew" data-act="onlyNew" ${DB.onlyNew?'checked':''}><span class="cb"></span> 아직 안 쓴 글감만 보기</label>
+  </div>
+  <div class="bar" style="margin-top:0"><div class="seg sm" role="group" aria-label="글 종류">
+    <button data-act="filter" data-f="all" aria-pressed="${f==='all'}">전체</button>
+    ${typesHere.map(k=>`<button data-act="filter" data-f="${k}" aria-pressed="${f===k}">${TYPES[k].label}</button>`).join('')}</div></div>
+  <div class="grid">
+    ${list.map((t,i)=>{const w=done.find(x=>x.topicId===t.id);const s=w?starOf(w):0;return `<button class="tile" data-act="start" data-t="${t.id}">
+      ${s===3?'<span class="stamp">참<br>잘했어요</span>':''}
+      <span class="no"><span class="circ tnum">${all.indexOf(t)+1}</span><small>${TYPES[t.type].label}</small></span>
+      <span class="tt">${esc(t.title)}</span>
+      <span class="snip">${esc(t.think[0])}</span>
+      <span class="st">${w?`${starsHtml(s)}<span>완성!</span>`:'<span class="new">새 글감!</span><span>→</span>'}</span></button>`}).join('')}
+    <div class="tile custom">
+      <span class="no"><span class="circ">✎</span><small>내가 정한 주제</small></span>
+      <input id="cTitle" type="text" placeholder="예: 내가 판사가 된다면" maxlength="40" aria-label="주제">
+      <select id="cType" aria-label="글 종류">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('')}</select>
+      <span class="st"><button class="btn sm pri" data-act="startCustom">이 주제로 쓰기</button></span>
+    </div>
+  </div>
+  ${!list.length?`<div class="empty">${ch('songi','cheer')}<div class="bubble l">이 학년 글감을 다 썼어! 대단해~<br>체크를 끄면 다시 볼 수 있어.</div></div>`:''}
+  <div class="shelf-h"><h2>내 글 모음</h2><span style="color:var(--ink-2)">${works.length}편 · 이 기기에 저장돼요</span></div>
+  ${works.length?`<ul class="shelf">${works.map(w=>{const tp=topicOf(w);return `<li>
+    <div style="display:grid"><span class="t">${esc(w.title||tp.title)} ${w.done?starsHtml(starOf(w)):''}</span>
+    <span class="m"><span>${w.grade}학년 · ${TYPES[w.type].label}</span><span class="tnum">${countChars(w.text)}자</span><span>${w.done?'완성':STEP_NAMES[w.step||0]+' 하는 중'}</span><span>${new Date(w.updated).toLocaleDateString('ko-KR')}</span></span></div>
+    <div class="acts row">
+      ${view.confirmDel===w.id?`<span class="ask-del">정말 지울까요? <button class="linkbtn red" data-act="delYes" data-id="${w.id}">지우기</button><button class="linkbtn" data-act="delNo">그만두기</button></span>`:`<button class="linkbtn" data-act="del" data-id="${w.id}">지우기</button>`}
+      <button class="btn sm" data-act="mom" data-id="${w.id}">💌 엄마에게</button>
+      <button class="btn sm pri" data-act="open" data-id="${w.id}">${w.done?'다시 보기':'이어 쓰기 →'}</button>
+    </div></li>`}).join('')}</ul>`:`<div class="empty">${ch('bookie','happy','bob')}<div class="bubble l">아직 쓴 글이 없어.<br>위에서 글감을 하나 골라 봐!</div></div>`}
+  <details class="note"><summary>선생님·부모님께</summary>
+    <p>글감과 단계는 인천광역시교육청 「생각이 깊어지는 글쓰기」 3·4학년 워크북과 지도서, 3~6학년 서·논술형 평가도구 자료집, 저학년 논술교실 지도 자료, 5학년 독서·논술 자료를 바탕으로 만들었어요. 한 편은 ‘생각 열기 → 질문 만들기(1·2학년은 생각 그물) → 개요 짜기 → 글쓰기 → 빨간펜 첨삭 → 늘리고 완성’ 순서로 진행돼요.</p>
+    <p>빨간펜 첨삭은 자주 틀리는 맞춤법·띄어쓰기와 워크북 검토 기준(내용·짜임·표현)을 스스로 살펴 주고, Claude 안에서 열면 AI 선생님 첨삭도 받을 수 있어요. 글은 이 기기의 브라우저에만 저장되니, 다른 기기로 옮기거나 보관할 때는 아래 버튼으로 파일을 저장해 두세요.</p>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="backup">모든 글 파일로 저장</button><label class="btn sm" for="restoreIn" style="cursor:pointer">파일에서 불러오기</label><input id="restoreIn" type="file" accept=".json,application/json" class="sr"></div>
+    <p id="saveInd" class="save-ind"></p>
+  </details>`;
+}
+
+function workHTML(){
+  const w=curWork();if(!w){view.screen='home';return homeHTML()}
+  const tp=topicOf(w);
+  const rail=STEP_NAMES.map((s,i)=>`<li><button data-act="step" data-s="${i}" class="${view.step===i?'on':(w.maxStep||0)>i||w.done?'fin':''}" ${view.step===i?'aria-current="step"':''}>${s}</button></li>`).join('');
+  const L=[leftMaterial,leftMaterial,leftMaterial,leftDraft,leftMarked,leftSents][view.step](w,tp);
+  const R=[r0,r1,r2,r3,r4,r5][view.step](w,tp);
+  return `<div class="shead">
+      <button class="back" data-act="home" aria-label="목록으로">← 목록</button>
+      <h2><span class="circ tnum" style="width:44px;height:44px;font-size:24px">${w.grade}</span> ${esc(tp.title)}</h2>
+      <span class="lv">${w.grade}학년 · ${TYPES[w.type].label}</span>
+      <span class="sp"></span><span id="saveInd" class="save-ind"></span>
+    </div>
+    <div class="rail-wrap"><ol class="rail">${rail}</ol></div>
+    <div class="body">${L}<section class="side" aria-live="polite">${R}</section></div>`;
+}
+function cardTop(w,title,cnt){
+  const i=view.step;
+  return `<div class="sec"><h3><span class="circ">${CIRC[i]}</span> ${title}</h3><span class="cnt tnum">${cnt||`${i+1}/6단계`}</span></div>
+  <div class="qbar" aria-hidden="true"><i style="transform:scaleX(${(i+1)/6})"></i></div>`;
+}
+const askRow=(who,mood,html,cls='')=>`<div class="ask">${ch(who,mood,cls)}<p class="bubble l">${html}</p></div>`;
+function navActs(){
+  return `<div class="acts sp">${view.step>0?`<button class="btn" data-act="prev">← ${STEP_NAMES[view.step-1]}</button>`:'<span></span>'}${view.step<5?`<button class="btn pri" data-act="next">${STEP_NAMES[view.step+1]} →</button>`:''}</div>`;
+}
+
+/* 왼쪽: 지문 카드 */
+function leftMaterial(w,tp){
+  return `<section class="pcard mat" aria-label="읽을 글"><span class="doodle d2">여기 읽어 봐~</span>
+    <div class="ptools"><span class="lab">읽을 글</span><span class="penhint">${esc(TYPES[w.type].label)}</span></div>
+    <div class="pscroll"><div class="ptext">${tp.body.split('\n').filter(Boolean).map(p=>`<p class="para">${esc(p)}</p>`).join('')}</div></div>
+    <div class="pfoot"><span style="font-size:16px">자료: ${esc(tp.src)}</span></div></section>`;
+}
+function leftDraft(w,tp){
+  const [a,b]=TARGET[w.grade];
+  return `<section class="pcard" aria-label="글 쓰는 곳"><span class="doodle d2">여기에 써 봐!</span>
+    <div class="ptools"><div class="pens" role="group" aria-label="문장 도우미">${STARTERS[w.type].slice(0,5).map(s=>`<button class="pen sm" data-act="ins" data-v="${esc(s)}"><span class="k">+</span>${esc(s)}</button>`).join('')}</div></div>
+    <div class="pscroll"><label class="sr" for="draft">글 쓰는 곳</label><textarea id="draft" class="draft" data-inp="text" placeholder="개요를 보면서 문장으로 써 봐요.">${esc(w.text||'')}</textarea></div>
+    <div class="pfoot"><div class="meter"><span>글자 수<b class="tnum" id="mChars">0</b>자</span><span>문장<b class="tnum" id="mSents">0</b></span><span>문단<b class="tnum" id="mParas">0</b></span></div><span class="penhint" id="mGoal">목표 ${a}~${b}자</span></div></section>`;
+}
+function markedHTML(text,errs,aiFixes){
+  const marks=errs.map(e=>({...e}));
+  (aiFixes||[]).forEach(f=>{if(!f.from||f.from===f.to)return;const s=text.indexOf(f.from);if(s<0)return;const e=s+f.from.length;if(marks.some(m=>!(e<=m.s||s>=m.e)))return;marks.push({s,e,from:f.from,to:f.to})});
+  marks.sort((a,b)=>a.s-b.s);let out='',p=0;
+  marks.forEach(m=>{out+=esc(text.slice(p,m.s))+`<ruby><s>${esc(m.from)}</s><rt>${esc(m.to)}</rt></ruby>`;p=m.e});
+  return out+esc(text.slice(p));
+}
+function paras(html){return html.split('\n').filter(x=>x.trim()).map(p=>`<p class="para">${p}</p>`).join('')}
+function leftMarked(w,tp){
+  if(!w.fb||!w.text)return leftDraftPreview(w);
+  const aiF=w.ai&&w.ai.fixes?w.ai.fixes.filter(f=>w.text.includes(f.from)):[];
+  const n=w.fb.errs.length+aiF.length;
+  return `<section class="pcard" aria-label="빨간펜으로 고친 글"><span class="doodle d2">빨간펜 슥슥~</span>
+    <div class="ptools"><span class="lab">빨간펜으로 고친 글</span><button class="pen" data-act="step" data-s="3"><span class="k">✎</span>글 고치러 가기</button></div>
+    <div class="pscroll"><div class="ptext marked">${paras(markedHTML(w.text,w.fb.errs,aiF))}</div></div>
+    <div class="pfoot"><div class="meter"><span>고칠 곳<b class="tnum">${n}</b>군데</span><span>글자 수<b class="tnum">${w.fb.chars}</b>자</span></div><span class="penhint">${n?'빨간 글씨로 고쳐 봐!':'맞춤법 통과!'}</span></div></section>`;
+}
+function leftDraftPreview(w){
+  return `<section class="pcard" aria-label="내 글"><div class="ptools"><span class="lab">내 글</span></div>
+    <div class="pscroll"><div class="ptext">${w.text?paras(esc(w.text)):'<p class="para" style="color:var(--ink-3)">아직 쓴 글이 없어요.</p>'}</div></div></section>`;
+}
+function leftSents(w,tp){
+  if(w.done&&!view.more){
+    return `<section class="pcard" aria-label="완성한 글"><span class="pstamp" style="top:48px">참<br>잘했어요</span>
+      <div class="ptools"><span class="lab">완성한 글</span><button class="pen" data-act="more"><span class="k">+</span>문장 더 늘리기</button></div>
+      <div class="pscroll"><div class="ptext"><h4>${esc(w.title||tp.title)}</h4><p class="by">${w.grade}학년 ${esc(DB.name)} · ${new Date(w.doneAt||Date.now()).toLocaleDateString('ko-KR')}</p>${paras(esc(w.text.trim()))}</div></div>
+      <div class="pfoot"><div class="meter"><span>글자 수<b class="tnum">${countChars(w.text)}</b>자</span></div></div></section>`;
+  }
+  const lim=w.grade<=2?8:14,grown=new Set(w.grown||[]);let idx=0;
+  const body=(w.text||'').split('\n').filter(x=>x.trim()).map(p=>{
+    const ss=splitSents(p);
+    return `<p class="para">${ss.map(s=>{const i=idx++;const cls=grown.has(s)?'grown':countChars(s)<lim?'short':'';return `<span class="sent ${cls} ${view.sel===i?'on':''}" data-act="sel" data-i="${i}" role="button" tabindex="0">${esc(s)}</span>`}).join(' ')}</p>`}).join('');
+  return `<section class="pcard" aria-label="문장 고르기"><span class="doodle d2">문장을 콕!</span>
+    <div class="ptools"><span class="lab">늘리고 싶은 문장을 눌러요</span></div>
+    <div class="pscroll"><div class="ptext">${body||'<p class="para" style="color:var(--ink-3)">아직 쓴 글이 없어요.</p>'}</div></div>
+    <div class="pfoot"><div class="meter"><span>글자 수<b class="tnum">${countChars(w.text)}</b>자</span><span>늘린 문장<b class="tnum">${w.grownN||0}</b></span></div><span class="penhint">물결 밑줄 = 짧은 문장</span></div></section>`;
+}
+
+/* 오른쪽: 단계 카드 */
+function r0(w,tp){
+  return `<div class="card">${cardTop(w,'생각 열기')}
+    ${askRow('bookie','happy','글을 천천히 읽고<br>떠오르는 걸 모아 봐!','bob')}
+    <ul class="checks">${tp.think.map(q=>`<li><span class="k">?</span><span>${esc(q)}</span></li>`).join('')}</ul>
+    <div class="fld" style="margin-top:14px"><label for="wordIn">떠오르는 낱말 모으기</label>
+      <div class="row"><input id="wordIn" type="text" placeholder="낱말 쓰고 ‘넣기’" maxlength="20" style="flex:1;min-width:0;width:auto"><button class="btn sm" data-act="addWord">넣기</button></div>
+      <div class="row" style="margin-top:4px">${(w.words||[]).map((x,i)=>`<span class="wchip">${esc(x)}<button data-act="rmWord" data-i="${i}" aria-label="${esc(x)} 빼기">×</button></span>`).join('')||'<span class="hint2">모은 낱말은 글 쓸 때 다시 보여요.</span>'}</div></div>
+    <div class="fld"><label for="first">${w.type==='op'?'내 의견 한 줄 (나는 ~라고 생각해요)':'가장 쓰고 싶은 것 한 줄'}</label><textarea id="first" rows="2" data-inp="first">${esc(w.first||'')}</textarea></div>
+    ${navActs()}</div>`;
+}
+function r1(w,tp){
+  if(w.grade<=2){
+    return `<div class="card">${cardTop(w,'생각 그물')}
+      ${askRow('songi','think','누가? 언제? 어디서?<br>짧게 답해 볼까?')}
+      ${WEB.map(([k,l])=>`<div class="fld"><label for="web_${k}">${l}?</label><input id="web_${k}" type="text" data-inp="web" data-k="${k}" value="${esc((w.web||{})[k]||'')}"></div>`).join('')}
+      <p class="hint">다 채우지 않아도 괜찮아!</p>${navActs()}</div>`;
+  }
+  const ex=tp.qex||[];
+  return `<div class="card">${cardTop(w,'질문 만들기')}
+    ${askRow('songi','think','궁금한 걸 질문으로<br>만들어 볼까?')}
+    <div class="opts">${Q_TYPES.map(([k,n,d],i)=>`<div class="qitem ${w.pick===k?'pick':''}"><span class="qt"><span class="circ">${i+1}</span>${n}</span>
+      <span class="ex">${d}${ex[i]?`<br>예) ${esc(ex[i])}`:''}</span>
+      <input type="text" id="q_${k}" data-inp="q" data-k="${k}" value="${esc((w.qs||{})[k]||'')}" placeholder="내가 만든 질문" aria-label="${n}">
+      <label class="chk"><input type="radio" name="pickq" data-act="pickq" data-k="${k}" ${w.pick===k?'checked':''}><span class="cb" style="border-radius:50%"></span> 이 질문으로 글을 쓸래요</label></div>`).join('')}</div>
+    <div class="fld" style="margin-top:14px"><label for="pickAns">고른 질문에 대한 내 생각</label>
+      ${w.pick&&(w.qs||{})[w.pick]?`<p class="ctx" style="margin:0"><span class="cl">고른 질문</span>${esc(w.qs[w.pick])}</p>`:''}
+      <textarea id="pickAns" rows="3" data-inp="pickAns" placeholder="나는 ~라고 생각해. 왜냐하면 ~">${esc(w.pickAns||'')}</textarea></div>
+    <p class="hint">여러 의견이 나올 수 있는 질문이 좋은 질문이야!</p>${navActs()}</div>`;
+}
+function r2(w,tp){
+  const ol=outlineFor(w.type,w.grade);
+  const got=[(w.words||[]).length?`<b>낱말</b> ${w.words.map(esc).join(', ')}`:'',w.first?`<b>한 줄 생각</b> ${esc(w.first)}`:'',w.pickAns?`<b>질문에 대한 생각</b> ${esc(w.pickAns)}`:'',w.web?WEB.filter(([k])=>w.web[k]).map(([k,l])=>`<b>${l}</b> ${esc(w.web[k])}`).join(' · '):''].filter(Boolean);
+  return `<div class="card">${cardTop(w,'개요 짜기')}
+    ${askRow('mongi','happy','처음·가운데·끝으로<br>뼈대를 세워 봐!','bob')}
+    ${got.length?`<div class="ctx"><span class="cl">모아 둔 생각</span>${got.join('<br>')}</div>`:''}
+    <div class="outline">${ol.map(([k,a,b,h])=>`<div class="oblk"><div class="ol">${a}<small>${b}</small></div>
+      <div class="fld"><label class="sr" for="ol_${k}">${a} ${b}</label><textarea id="ol_${k}" rows="2" data-inp="ol" data-k="${k}" placeholder="${esc(h)}">${esc((w.ol||{})[k]||'')}</textarea></div></div>`).join('')}</div>
+    <p class="hint">짧게 써도 돼! 다음에 문장으로 풀어 써.</p>${navActs()}</div>`;
+}
+function r3(w,tp){
+  const ol=outlineFor(w.type,w.grade).filter(([k])=>(w.ol||{})[k]);
+  return `<div class="card">${cardTop(w,'글쓰기')}
+    ${askRow('mongi','think','개요를 보면서<br>문장으로 써 봐!')}
+    ${ol.length?`<div class="ctx"><span class="cl">내 개요</span>${ol.map(([k,a,b])=>`<b>${a}</b> ${esc(w.ol[k])}`).join('<br>')}</div>`:'<p class="ctx"><span class="cl">개요</span>개요가 비어 있어요. ③ 개요 짜기에서 채울 수 있어요.</p>'}
+    <button class="btn sm" data-act="pullOutline">${w.text?'개요를 글 아래에 붙이기':'개요로 글 시작하기'}</button>
+    <div class="bank"><h4>문장 도우미</h4><div class="pens">${STARTERS[w.type].map(s=>`<button class="pen sm" data-act="ins" data-v="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+    ${(w.words||[]).length?`<h4>모아 둔 낱말</h4><div class="pens">${w.words.map(s=>`<button class="pen sm" data-act="ins" data-v="${esc(s)}">${esc(s)}</button>`).join('')}</div>`:''}</div>
+    <div class="qbar" style="margin:16px 0 0" aria-hidden="true"><i id="meterBar" style="transform:scaleX(0)"></i></div>
+    <p class="hint" id="meterMsg"></p>${navActs()}</div>`;
+}
+function r4(w,tp){
+  if(w.fb&&w.fb.textSnap!==w.text){w.fb=analyze(w.text,w.grade,w.type);w.fb.textSnap=w.text;saveSoon()}
+  const fb=w.fb;
+  if(!fb||!w.text) return `<div class="card">${cardTop(w,'빨간펜 첨삭')}
+    ${w.text?`${askRow('songi','think','다 썼어?<br>빨간펜으로 살펴봐 줄게!')}<div class="acts"><button class="btn pri" data-act="check">빨간펜 첨삭 받기</button></div>`:`${askRow('mongi','oops','앗, 아직 쓴 글이 없어!<br>④ 글쓰기부터 해 볼까?')}`}
+    ${navActs()}</div>`;
+  const r=fb.rubric,avg=Math.max(1,Math.round((r.내용+r.짜임+r.표현)/3));
+  const aiF=w.ai&&w.ai.fixes?w.ai.fixes.filter(f=>w.text.includes(f.from)):[];
+  return `<div class="card">${cardTop(w,'빨간펜 첨삭')}
+    <div class="score">${starsHtml(avg,'stars bigstars')}<span style="font-size:20px;color:var(--ink-2)">${avg===3?'참 잘했어요!':avg===2?'잘했어! 조금만 더':'천천히 고쳐 보자'}</span></div>
+    <ul class="cats">${Object.entries(r).map(([k,v])=>`<li><span>${k}</span><span class="tr"><i class="${v<2?'lo':''}" style="width:${Math.round(v/3*100)}%"></i></span><span class="v tnum">${v}/3</span></li>`).join('')}</ul>
+    ${fb.good.length?`<div class="fb ok">${ch('songi','cheer','hop')}<div><h4>이건 잘했어!</h4><ul>${fb.good.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>`:''}
+    ${fb.fix.length?`<div class="fb no">${ch('mongi','think')}<div><h4>이렇게 고쳐 볼까?</h4><ul>${fb.fix.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>`:''}
+    ${fb.errs.length+aiF.length?`<div class="sec" style="margin-top:16px"><h3 style="font-size:24px">맞춤법 고치기</h3><button class="btn sm pri" data-act="fixAll">모두 고치기</button></div>
+    <div class="opts">${fb.errs.map((e,i)=>`<div class="fix"><span><s>${esc(e.from)}</s> → <span class="to">${esc(e.to)}</span><span class="why">${esc(e.why)}</span></span><button class="btn sm" data-act="fix" data-i="${i}">고치기</button></div>`).join('')}
+    ${aiF.map((f,i)=>`<div class="fix"><span><s>${esc(f.from)}</s> → <span class="to">${esc(f.to)}</span><span class="why">AI 선생님: ${esc(f.why||'')}</span></span><button class="btn sm" data-act="fixAI" data-i="${i}">고치기</button></div>`).join('')}</div>`:''}
+    <h3 style="font-size:24px;margin:18px 0 6px">스스로 점검해요</h3>
+    <div style="display:grid;gap:4px">${SELF[w.type].map(([k,q],i)=>`<label class="chk"><input type="checkbox" data-act="self" data-i="${i}" ${(w.self||{})[i]?'checked':''}><span class="cb"></span><span><b>${k}</b> ${esc(q)}</span></label>`).join('')}</div>
+    ${aiBox(w)}
+    ${navActs()}</div>`;
+}
+function aiBox(w){
+  if(!SAMPLE) return `<p class="hint" style="text-align:left;font-size:19px">AI 선생님 첨삭은 Claude 안에서 열었을 때 쓸 수 있어요.</p>`;
+  if(view.aiBusy) return `<div class="timer"><h4>AI 선생님</h4><div class="thinking">꼼꼼히 읽고 있어요…</div><div><button class="btn sm" data-act="aiStop">멈추기</button></div></div>`;
+  const ai=w.ai;
+  return `<div class="timer"><h4>AI 선생님 첨삭</h4>
+    ${ai?`${(ai.praise||[]).map(x=>`<p>💗 ${esc(x)}</p>`).join('')}${(ai.comments||[]).map(x=>`<p>✏️ ${esc(x)}</p>`).join('')}${(ai.expand||[]).length?`<p><b>글을 늘려 볼 질문</b><br>${ai.expand.map(x=>'· '+esc(x)).join('<br>')}</p>`:''}`:'<p>흐름과 까닭까지 더 자세히 봐 줘요. 글을 대신 써 주지는 않아요.</p>'}
+    ${view.aiErr?`<p style="color:var(--coral)">${esc(view.aiErr)}</p>`:''}
+    <div><button class="btn sm pri" data-act="aiCheck">${ai?'다시 첨삭 받기':'AI 선생님께 첨삭 받기'}</button></div></div>`;
+}
+function r5(w,tp){
+  const out=[];
+  if(w.done) out.push(resultCard(w,tp));
+  if(!w.done||view.more) out.push(expandCard(w,tp),finishCard(w,tp));
+  return out.join('');
+}
+function expandCard(w,tp){
+  const sents=splitSents((w.text||'').replace(/\n/g,' \n'));
+  const sel=view.sel>=0?allSents(w)[view.sel]:null;
+  const asks=sel?expandAsks(sel,w.type):[];
+  const bank={...BANK,...(w.grade>=5?BANK_HI:{})};
+  const [a]=TARGET[w.grade];
+  return `<div class="card">${cardTop(w,'문장 늘리기',`${countChars(w.text)}자 / 목표 ${a}자`)}
+    ${sel?`<p class="ctx"><span class="cl">고른 문장</span>${esc(sel)}</p>
+      <div class="pens">${asks.map(([q],i)=>`<button class="pen" data-act="ask" data-i="${i}"><span class="k">?</span>${q}</button>`).join('')}
+      ${SAMPLE?`<button class="pen" data-act="exAI" ${view.exBusy?'disabled':''}><span class="k">★</span>${view.exBusy?'생각 중…':'AI 질문'}</button>`:''}</div>
+      <p class="hintline" id="hintline">${esc(view.ask||'질문을 눌러 힌트를 봐!')}</p>
+      ${view.exAI?`<div class="ctx"><span class="cl">AI 선생님 질문</span>${(view.exAI.questions||[]).map(q=>'· '+esc(q)).join('<br>')}${view.exAI.example?`<br><b>이렇게 늘릴 수도 있어</b> ${esc(view.exAI.example)}`:''}</div>`:''}
+      <div class="fld"><label for="grow">늘린 문장</label><textarea id="grow" rows="3">${esc(sel)}</textarea></div>
+      <div class="acts"><span style="margin-right:auto;color:var(--ink-2)">원래 ${countChars(sel)}자</span><button class="btn pri" data-act="replace">이 문장으로 바꾸기</button></div>
+      <div class="bank">${Object.entries(bank).map(([k,v])=>`<h4>${k}</h4><div class="pens">${v.map(x=>`<button class="pen sm" data-act="insGrow" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`).join('')}</div>`
+    :askRow('bookie','happy','왼쪽 글에서 짧은 문장을<br>콕 눌러 봐! 쑥쑥 늘려 보자','bob')}
+  </div>`;
+}
+function finishCard(w,tp){
+  return `<div class="card"><div class="sec"><h3><span class="circ">✚</span> 문단 더하기</h3></div>
+    <div class="opts">${MORE[w.type].map(([n,s],i)=>`<button class="optbtn" data-act="addPara" data-i="${i}">${n}<span class="sub">${esc(s)}…</span></button>`).join('')}</div>
+    <div class="sec" style="margin-top:18px"><h3><span class="circ">✿</span> 완성하기</h3></div>
+    <div class="fld"><label for="titleIn">글 제목</label><input id="titleIn" type="text" data-inp="title" value="${esc(w.title||'')}" placeholder="${esc(w.type==='op'?'내 의견이 드러나는 제목':'글 내용이 드러나는 제목')}" maxlength="40"><span class="hint2">제목이 글의 주제를 잘 드러내는지 살펴봐요.</span></div>
+    <div class="acts sp"><button class="btn" data-act="prev">← 빨간펜 첨삭</button><button class="btn pri" data-act="finish" ${w.text?'':'disabled'}>${w.done?'완성본 다시 저장':'완성했어요!'}</button></div></div>`;
+}
+function resultCard(w,tp){
+  const first=w.firstLen||countChars(w.text),now=countChars(w.text),s=starOf(w);
+  const r=analyze(w.text,w.grade,w.type).rubric;
+  const msg=now>first?`처음 ${first}자에서<br>${now}자로 쑥쑥 늘었어!`:s===3?'우와, 정말 멋진 글이야!<br>참 잘했어요~':'끝까지 스스로 썼어!<br>다음엔 문장을 더 늘려 보자.';
+  return `<div class="card"><div class="sec"><h3><span class="circ">✿</span> 완성!</h3><span class="cnt">${w.grade}학년 · ${TYPES[w.type].label}</span></div>
+    <div class="score"><div class="big tnum">${now}<small>자</small></div>${starsHtml(s,'stars bigstars')}</div>
+    <div class="resrow">${ch('songi',s>=2?'cheer':'happy','hop')}<div class="bubble l pink">${msg}</div>${s===3?ch('mongi','cheer','bob'):''}</div>
+    <p class="growth">늘린 문장 <span class="hl-g tnum"><b>${w.grownN||0}</b>개</span> · 맞춤법 고친 곳 <span class="hl-y tnum"><b>${w.fixedN||0}</b>군데</span></p>
+    <ul class="cats">${Object.entries(r).map(([k,v])=>`<li><span>${k}</span><span class="tr"><i class="${v<2?'lo':''}" style="width:${Math.round(v/3*100)}%"></i></span><span class="v tnum">${v}/3</span></li>`).join('')}</ul>
+    <div class="momsend">${ch('mongi','happy','bob')}<div><b>엄마에게 글을 보내 볼까?</b><span>제목, 글자 수, 별점, 글 전체가 정리돼요</span></div><button class="btn pri" data-act="mom" data-id="${w.id}">💌 엄마에게 보내기</button></div>
+    <div class="acts"><button class="btn" data-act="home">목록으로</button><button class="btn" data-act="saveTxt">파일로 저장</button>${view.more?'':'<button class="btn" data-act="more">더 고치기</button>'}</div></div>`;
+}
+function allSents(w){return (w.text||'').split('\n').filter(x=>x.trim()).flatMap(p=>splitSents(p))}
+function updateMeter(){
+  const w=curWork();if(!w)return;const t=w.text||'';const [a,b]=TARGET[w.grade];const n=countChars(t);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+  set('mChars',n);set('mSents',splitSents(t).length);set('mParas',t.split(/\n+/).filter(p=>p.trim()).length);
+  const bar=$('#meterBar');if(bar)bar.style.transform=`scaleX(${Math.min(1,n/a)})`;
+  set('meterMsg',n>=a?'목표 글자 수 달성! 빨간펜 받으러 가자~':`목표까지 ${a-n}자 남았어!`);
+}
+
+/* ============ 동작 ============ */
+function touch(w){w.updated=Date.now();saveSoon()}
+function goStep(s){const w=curWork();view.step=s;view.sel=-1;view.ask='';view.exAI=null;view.aiErr='';w.step=s;w.maxStep=Math.max(w.maxStep||0,s);touch(w);render();window.scrollTo({top:0})}
+function newWork(topic,custom){
+  const w={id:uid(),topicId:topic?topic.id:null,topic:custom||null,grade:DB.grade,type:(custom||topic).type,words:[],text:'',step:0,maxStep:0,created:Date.now(),updated:Date.now()};
+  DB.works.push(w);persist();view={...view,screen:'work',id:w.id,step:0,sel:-1,ask:'',more:false};render();window.scrollTo({top:0});
+}
+function runCheck(w){const fb=analyze(w.text,w.grade,w.type);fb.textSnap=w.text;w.fb=fb;if(!w.firstLen){w.firstLen=fb.chars;w.firstDraft=w.text}touch(w);render()}
+function applyFix(w,from,to){const i=w.text.indexOf(from);if(i<0)return;w.text=w.text.slice(0,i)+to+w.text.slice(i+from.length);w.fixedN=(w.fixedN||0)+1}
+async function aiCheck(w){
+  if(!SAMPLE||view.aiBusy)return;
+  view.aiBusy=true;view.aiErr='';render();aiCtl=new AbortController();
+  const tp=topicOf(w);
+  const prompt=`너는 한국 초등학교 ${w.grade}학년 아이의 글쓰기를 봐 주는 다정한 국어 선생님이야.
+글 종류: ${TYPES[w.type].label}
+주제: ${tp.title}
+평가 기준(인천 「생각이 깊어지는 글쓰기」 검토 단계): 내용(의견·이유·예시 / 겪은 일·느낌), 짜임(처음-가운데-끝, 문장 연결), 표현(알맞은 낱말, 맞춤법·띄어쓰기·문장 부호).
+규칙:
+- 글을 대신 다시 써 주지 마. 아이가 스스로 고치도록 도와.
+- ${w.grade}학년이 이해할 수 있는 쉬운 말, 다정한 '~해요' 말투.
+- fixes의 from은 아이 글에 실제로 있는 글자 그대로(짧게, 한 낱말~한 구절)여야 하고, to는 고친 표현. 맞춤법·띄어쓰기·어색한 표현만. 최대 6개.
+- praise 2개(구체적인 칭찬), comments 2~3개(내용·짜임에 대한 고칠 점), expand 3개(글을 더 풍부하게 늘릴 수 있는 질문).
+- 점수 rubric은 각 1~3.
+JSON으로만 답해: {"praise":[""],"comments":[""],"fixes":[{"from":"","to":"","why":""}],"expand":[""],"rubric":{"내용":1,"짜임":1,"표현":1}}
+
+아이의 글:
+"""
+${w.text}
+"""`;
+  try{
+    const r=await SAMPLE.json(prompt,{signal:aiCtl.signal,modelTier:'default'});
+    w.ai={praise:(r.praise||[]).slice(0,3),comments:(r.comments||[]).slice(0,4),fixes:(r.fixes||[]).filter(f=>f&&f.from&&f.to).slice(0,8),expand:(r.expand||[]).slice(0,4)};
+    touch(w);
+  }catch(e){view.aiErr=AI_ERR[e&&e.code]||'AI 선생님이 지금은 답하기 어려워요. 빨간펜 첨삭을 먼저 참고해요.'}
+  view.aiBusy=false;aiCtl=null;render();
+}
+async function exAI(w,sent){
+  if(!SAMPLE||view.exBusy)return;view.exBusy=true;render();
+  try{const r=await SAMPLE.json(`초등 ${w.grade}학년 아이가 쓴 ${TYPES[w.type].label}의 한 문장이야: "${sent}"
+주제: ${topicOf(w).title}
+이 문장을 더 자세하고 풍부하게 늘릴 수 있도록 아이에게 던질 짧은 질문 3개와, 참고용으로 늘린 예시 문장 1개를 만들어 줘. 예시는 아이 문장의 내용을 바꾸지 말고 1~2문장으로. 쉬운 말.
+JSON으로만: {"questions":["","",""],"example":""}`,{modelTier:'quick'});
+    view.exAI={questions:(r.questions||[]).slice(0,3),example:r.example||''};
+  }catch(e){view.ask=AI_ERR[e&&e.code]||'지금은 AI 질문을 받을 수 없어요. 다른 질문 펜을 써 봐요.'}
+  view.exBusy=false;render();
+}
+function insertAt(el,val){
+  if(!el)return;const s=el.selectionStart??el.value.length,e=el.selectionEnd??s;const pre=el.value.slice(0,s);
+  const pad=pre&&!/\s$/.test(pre)?' ':'';
+  el.value=pre+pad+val+el.value.slice(e);const pos=s+pad.length+val.length;el.focus();el.setSelectionRange(pos,pos);
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+}
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-act]');if(!b)return;
+  const act=b.dataset.act;const w=curWork();
+  switch(act){
+    case 'grade':DB.grade=+b.dataset.g;DB.filter='all';persist();render();break;
+    case 'filter':DB.filter=b.dataset.f;persist();render();break;
+    case 'onlyNew':DB.onlyNew=b.checked;persist();render();break;
+    case 'start':newWork(TOPICS.find(t=>t.id===b.dataset.t));break;
+    case 'startCustom':{const title=$('#cTitle').value.trim();if(!title){$('#cTitle').focus();toast('주제를 먼저 써 주세요');return}
+      const type=$('#cType').value;newWork(null,{id:'c'+uid(),g:DB.grade,type,title,src:'내가 정한 주제',body:`내가 정한 주제: ${title}\n이 주제에 대해 무엇을 쓰고 싶은지 떠올려 봐요.`,think:[`‘${title}’ 하면 무엇이 먼저 떠오르나요?`,'왜 이 주제를 골랐나요?','읽는 사람에게 꼭 전하고 싶은 것은?']});break}
+    case 'open':{const x=DB.works.find(x=>x.id===b.dataset.id);view={...view,screen:'work',id:x.id,step:x.done?5:(x.step||0),sel:-1,ask:'',exAI:null,more:false};render();window.scrollTo({top:0});break}
+    case 'home':view.screen='home';view.confirmDel=null;render();window.scrollTo({top:0});break;
+    case 'del':view.confirmDel=b.dataset.id;render();break;
+    case 'delNo':view.confirmDel=null;render();break;
+    case 'delYes':DB.works=DB.works.filter(x=>x.id!==b.dataset.id);view.confirmDel=null;persist();render();toast('글을 지웠어요');break;
+    case 'mom':{const x=DB.works.find(x=>x.id===b.dataset.id);if(x)sendMom(x);break}
+    case 'todayMom':{const ws=DB.works.filter(x=>x.done&&dayKey(x.doneAt)===dayKey(Date.now()));openSend(dayMsg(ws),'오늘 쓴 글을 엄마에게 보내자!',`${DB.name}_오늘의글_${new Date().toISOString().slice(0,10)}.txt`);break}
+    case 'step':goStep(+b.dataset.s);break;
+    case 'next':goStep(Math.min(5,view.step+1));break;
+    case 'prev':goStep(Math.max(0,view.step-1));break;
+    case 'more':view.more=true;view.sel=-1;render();break;
+    case 'addWord':{const i=$('#wordIn');const v=i.value.trim();if(!v)return;w.words=[...(w.words||[]),v];touch(w);render();$('#wordIn').focus();break}
+    case 'rmWord':w.words.splice(+b.dataset.i,1);touch(w);render();break;
+    case 'pickq':w.pick=b.dataset.k;touch(w);render();break;
+    case 'pullOutline':{const ol=outlineFor(w.type,w.grade).map(([k])=>(w.ol||{})[k]).filter(Boolean);if(!ol.length){toast('개요가 비어 있어요');return}
+      w.text=(w.text?w.text.replace(/\s+$/,'')+'\n\n':'')+ol.join('\n\n');touch(w);render();break}
+    case 'ins':insertAt($('#draft'),b.dataset.v);break;
+    case 'check':runCheck(w);break;
+    case 'fix':{const e=w.fb.errs[+b.dataset.i];applyFix(w,e.from,e.to);runCheck(w);toast('고쳤어요');break}
+    case 'fixAI':{const f=w.ai.fixes.filter(f=>w.text.includes(f.from))[+b.dataset.i];if(f){applyFix(w,f.from,f.to);w.ai.fixes=w.ai.fixes.filter(x=>x!==f)}runCheck(w);toast('고쳤어요');break}
+    case 'fixAll':{[...w.fb.errs].reverse().forEach(e=>{w.text=w.text.slice(0,e.s)+e.to+w.text.slice(e.e);w.fixedN=(w.fixedN||0)+1});
+      if(w.ai&&w.ai.fixes){w.ai.fixes.forEach(f=>{if(w.text.includes(f.from))applyFix(w,f.from,f.to)});w.ai.fixes=[]}runCheck(w);toast('모두 고쳤어요');break}
+    case 'self':w.self={...(w.self||{}),[b.dataset.i]:b.checked};touch(w);break;
+    case 'aiCheck':aiCheck(w);break;
+    case 'aiStop':if(aiCtl)aiCtl.abort();break;
+    case 'sel':view.sel=+b.dataset.i;view.ask='';view.exAI=null;render();if(window.matchMedia('(max-width:900px)').matches){const c=document.querySelector('.side');if(c)c.scrollIntoView({block:'start',behavior:'smooth'})}break;
+    case 'ask':{const s=allSents(w)[view.sel];const a=expandAsks(s,w.type)[+b.dataset.i];view.ask=a?a[1]:'';const h=$('#hintline');if(h)h.textContent=view.ask;$('#grow')?.focus();break}
+    case 'exAI':exAI(w,allSents(w)[view.sel]);break;
+    case 'insGrow':insertAt($('#grow'),b.dataset.v);break;
+    case 'replace':{const s=allSents(w)[view.sel];const nv=$('#grow').value.trim();if(!s||!nv||nv===s)return;
+      const i=w.text.indexOf(s);if(i<0)return;w.text=w.text.slice(0,i)+nv+w.text.slice(i+s.length);
+      const diff=countChars(nv)-countChars(s);if(diff>0){w.grownN=(w.grownN||0)+1;w.grown=[...(w.grown||[]),nv]}
+      touch(w);view.ask='';view.exAI=null;render();toast(diff>0?`문장이 ${diff}자 늘었어요!`:'문장을 바꿨어요');break}
+    case 'addPara':{const s=MORE[w.type][+b.dataset.i][1];w.text=(w.text||'').replace(/\s+$/,'')+'\n\n'+s;touch(w);goStep(3);
+      setTimeout(()=>{const d=$('#draft');if(d){d.focus();d.setSelectionRange(d.value.length,d.value.length);d.scrollTop=d.scrollHeight}},30);break}
+    case 'finish':{if(!w.firstLen)w.firstLen=countChars(w.text);w.done=true;w.doneAt=Date.now();w.fb=analyze(w.text,w.grade,w.type);w.fb.textSnap=w.text;view.more=false;view.sel=-1;touch(w);persist();render();window.scrollTo({top:0});toast('완성! 이 기기에 저장했어요');break}
+    case 'saveTxt':saveFile(`${DB.name}_${(w.title||topicOf(w).title).slice(0,20)}.txt`,`${w.title||topicOf(w).title}\n${w.grade}학년 ${DB.name} · ${today()}\n\n${w.text.trim()}\n`,'text/plain');break;
+    case 'backup':saveFile(`${DB.name}_글쓰기_백업_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(DB,null,1),'application/json');break;
+  }
+});
+document.addEventListener('input',ev=>{
+  const el=ev.target;const k=el.dataset.inp;if(!k)return;
+  if(k==='name'){DB.name=el.value.trim()||'지호';const nm=$('#nm');if(nm)nm.textContent=DB.name;saveSoon();return}
+  const w=curWork();if(!w)return;
+  if(k==='text'){w.text=el.value;updateMeter()}
+  else if(k==='web'){w.web={...(w.web||{}),[el.dataset.k]:el.value}}
+  else if(k==='q'){w.qs={...(w.qs||{}),[el.dataset.k]:el.value}}
+  else if(k==='ol'){w.ol={...(w.ol||{}),[el.dataset.k]:el.value}}
+  else w[k]=el.value;
+  touch(w);
+});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'&&ev.target.id==='wordIn'){ev.preventDefault();$('[data-act="addWord"]').click()}
+  if((ev.key==='Enter'||ev.key===' ')&&ev.target.classList&&ev.target.classList.contains('sent')){ev.preventDefault();ev.target.click()}
+  if(ev.key==='Escape'&&$('#layer').innerHTML)closeModal();
+});
+document.addEventListener('change',ev=>{
+  if(ev.target.id!=='restoreIn')return;const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.works))throw 0;
+    const ids=new Set(DB.works.map(w=>w.id));let n=0;d.works.forEach(w=>{if(!ids.has(w.id)){DB.works.push(w);n++}});persist();render();toast(`${n}편을 불러왔어요`)}catch(e){toast('글쓰기 백업 파일이 아니에요')}};r.readAsText(f);
+});
+
+render();
+if(document.readyState==='complete')initCaps();else window.addEventListener('load',initCaps);
+</script>
+</body></html>
