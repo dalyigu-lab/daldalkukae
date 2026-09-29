@@ -522,7 +522,7 @@ const MORE={
 /* ============ 저장 (기기 저장: 이 기기의 브라우저에 자동 저장) ============ */
 const KEY='jiho-writing-v1';
 function loadDB(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return null}
-let DB=loadDB()||{name:'지호',grade:2,works:[],filter:'all'};
+let DB=loadDB()||{name:'',grade:2,works:[],filter:'all'};
 let storageOK=true;
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(DB));storageOK=true}catch(e){storageOK=false}markSaved()}
 let saveT;function saveSoon(){clearTimeout(saveT);saveT=setTimeout(persist,500)}
@@ -761,7 +761,7 @@ function reportText(w){
   const r=fb.rubric;const st=n=>'★'.repeat(n)+'☆'.repeat(3-n);
   const first=w.firstLen||fb.chars;const now=countChars(w.text);
   const praise=(w.ai&&w.ai.praise&&w.ai.praise[0])||fb.good[0]||'끝까지 스스로 썼어요.';
-  return `📮 ${DB.name}의 글쓰기 보고서
+  return `📮 ${DB.name||'우리 아이'}의${licLine()?' ('+licLine()+')':''} 글쓰기 보고서
 날짜: ${today()}
 ${w.grade}학년 · ${TYPES[w.type].label} · ${tp.title}
 제목: ${w.title||tp.title}
@@ -780,7 +780,7 @@ ${(w.text||'').trim()}
 엄마의 한마디: `;
 }
 function dayMsg(ws){
-  return `💌 ${DB.name}의 오늘 글쓰기 (${today()})
+  return `💌 ${DB.name||'우리 아이'}의 오늘 글쓰기 (${today()})
 오늘 ${ws.length}편을 완성했어요!
 
 `+ws.map((w,i)=>{const tp=topicOf(w);return `${i+1}. ${w.title||tp.title} (${w.grade}학년 · ${TYPES[w.type].label})
@@ -823,7 +823,7 @@ function openSend(text,title,fileName){
 }
 function sendMom(w){
   if(!w.text||!w.text.trim()){toast('아직 쓴 글이 없어요');return}
-  openSend(reportText(w),w.done?'완성한 글을 엄마에게 보내자!':'지금까지 쓴 글을 엄마에게 보내자!',`${DB.name}_${(w.title||topicOf(w).title).slice(0,20)}.txt`);
+  openSend(reportText(w),w.done?'완성한 글을 엄마에게 보내자!':'지금까지 쓴 글을 엄마에게 보내자!',`${DB.name||'글쓰기'}_${(w.title||topicOf(w).title).slice(0,20)}.txt`);
 }
 function closeModal(){$('#layer').innerHTML=''}
 
@@ -967,7 +967,7 @@ function worksheetHTML(w){
   const lines=n=>'<div class="lines">'+'<div></div>'.repeat(n)+'</div>';
   const rows=Math.min(16,Math.max(10,Math.ceil(b/24)));
   return `<div class="pw">
-    <div class="meta"><span>${w.grade}학년 · ${esc(TYPES[w.type].label)}</span><span>이름: <span class="blank">${esc(DB.name||'')}</span></span><span>날짜: <span class="blank"></span></span></div>
+    <div class="meta"><span>${w.grade}학년 · ${esc(TYPES[w.type].label)}</span><span>${esc(licLine())}</span><span>이름: <span class="blank">${esc(DB.name||'')}</span></span><span>날짜: <span class="blank"></span></span></div>
     <h1>${esc(tp.title)}</h1>
     <h2>① 읽고 떠올려요</h2>
     <div class="mat">${esc(tp.body)}</div><div class="src">자료: ${esc(tp.src)}</div>
@@ -988,7 +988,7 @@ function worksheetHTML(w){
 function finalPrintHTML(w){
   const tp=topicOf(w);const fb=analyze(w.text,w.grade,w.type);const r=fb.rubric;const st=n=>'★'.repeat(n)+'☆'.repeat(3-n);
   return `<div class="pw">
-    <div class="meta"><span>${w.grade}학년 · ${esc(TYPES[w.type].label)}</span><span>${esc(DB.name||'')}</span><span>${new Date(w.doneAt||Date.now()).toLocaleDateString('ko-KR')}</span></div>
+    <div class="meta"><span>${w.grade}학년 · ${esc(TYPES[w.type].label)}</span><span>${esc(DB.name||'')} ${esc(licLine())}</span><span>${new Date(w.doneAt||Date.now()).toLocaleDateString('ko-KR')}</span></div>
     <h1>${esc(w.title||tp.title)}</h1>
     <p class="tip">글감: ${esc(tp.title)} · ${countChars(w.text)}자${w.firstLen?` (처음 ${w.firstLen}자)`:''}</p>
     <div class="paper">${esc((w.text||'').trim())}</div>
@@ -1014,11 +1014,62 @@ function doPrint(html,fileName,title){
   setTimeout(()=>{window.print()},60);
 }
 
+/* ============ 이용 코드 (구매자 전용 · 기기 2대 · 1년) ============ */
+const LICENSE_URL='';   /* 구글 시트 Apps Script 웹 앱 주소를 넣으면 코드 확인이 켜져요 */
+const LIC_KEY='dal-writing-license';
+function licGet(){try{return JSON.parse(localStorage.getItem(LIC_KEY)||'null')}catch(e){return null}}
+function licSet(v){try{v?localStorage.setItem(LIC_KEY,JSON.stringify(v)):localStorage.removeItem(LIC_KEY)}catch(e){}}
+function deviceId(){let d=null;try{d=localStorage.getItem('dal-device')}catch(e){}
+  if(!d){d='d'+(window.crypto&&crypto.randomUUID?crypto.randomUUID().replace(/-/g,''):uid()+uid());try{localStorage.setItem('dal-device',d)}catch(e){}}return d}
+const ymd=t=>{const d=new Date(t);return `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`};
+function licLine(){const L=LICENSE_URL&&licGet();return L&&L.name?`${L.name}${/님$/.test(L.name)?'':'님'} 가정 전용 · ${ymd(L.expires)}까지`:''}
+function needGate(){return !!LICENSE_URL&&!(window.claude&&window.claude.use)}
+async function licCall(code,check){
+  const u=LICENSE_URL+'?code='+encodeURIComponent(code)+'&device='+encodeURIComponent(deviceId())+(check?'&check=1':'');
+  const r=await fetch(u,{cache:'no-store'});return r.json();
+}
+const LIC_MSG={nocode:'코드를 다시 확인해 주세요. (예: DAL-7K3P-Q9WX)',off:'사용이 멈춘 코드예요. 스마트스토어 톡톡으로 문의해 주세요.',expired:'이용 기간(1년)이 끝났어요. 스마트스토어에서 다시 만나요!',
+  full:'이 코드는 이미 등록할 수 있는 기기를 다 썼어요. 판매자에게 문의해 주세요.',notreg:'이 기기의 등록이 풀렸어요. 코드를 다시 넣어 주세요.',offline:'인터넷에 연결해서 한 번 확인이 필요해요.',network:'인터넷 연결을 확인하고 다시 눌러 주세요.',bad:'코드를 다시 확인해 주세요.'};
+let gateMsg='',gateBusy=false;
+function gate(reason){gateMsg=reason?(LIC_MSG[reason]||LIC_MSG.nocode):'';view.screen='gate';render()}
+function gateHTML(){
+  return `<div style="max-width:560px;margin:6vh auto 0;display:grid;gap:18px">
+    <div style="display:flex;align-items:flex-end;gap:6px">${ch('songi','happy','bob')}<div class="bubble l pink" style="flex:1;margin-left:12px;font-size:22px">안녕! 나는 송이야.<br>받은 <b>이용 코드</b>를 넣어 줘!</div></div>
+    <div class="card" style="display:grid;gap:12px">
+      <h1 class="brand" style="font-size:40px;margin:0">달달맘의 <span class="red hl">빨간펜 글쓰기</span></h1>
+      <div class="fld" style="margin:0"><label for="licIn">이용 코드</label><input id="licIn" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="DAL-XXXX-XXXX" maxlength="20" style="font-size:22px;letter-spacing:2px;text-transform:uppercase"></div>
+      <p class="send-msg" id="licMsg" aria-live="polite" style="margin:0">${esc(gateMsg)}</p>
+      <div class="acts" style="margin:0"><button class="btn pri" data-act="licGo" ${gateBusy?'disabled':''}>${gateBusy?'확인하는 중…':'시작하기'}</button></div>
+      <p class="hint2" style="font-family:var(--f-text);font-size:14px;color:var(--ink-2);margin:0">코드 하나로 기기 2대까지, 처음 등록한 날부터 1년 동안 쓸 수 있어요. 구매하신 가정에서만 사용해 주세요.</p>
+    </div></div>`;
+}
+async function licGo(){
+  const i=$('#licIn');const code=(i&&i.value||'').trim().toUpperCase();if(!code){gateMsg='코드를 넣어 주세요.';render();return}
+  if(gateBusy)return;gateBusy=true;gateMsg='';render();$('#licIn').value=code;
+  try{const r=await licCall(code,false);
+    if(r&&r.ok){licSet({code,name:r.name,expires:r.expires,checked:Date.now()});gateBusy=false;view.screen='home';render();toast(`${r.name}님, 반가워요!`);return}
+    gateMsg=LIC_MSG[r&&r.reason]||LIC_MSG.nocode;
+  }catch(e){gateMsg=LIC_MSG.network}
+  gateBusy=false;render();const j=$('#licIn');if(j)j.value=code;
+}
+async function boot(){
+  if(!needGate()){render();return}
+  const L=licGet();
+  if(!L||!L.code){gate();return}
+  if(new Date(L.expires)<new Date()){licSet(null);gate('expired');return}
+  render();
+  try{const r=await licCall(L.code,true);
+    if(r&&r.ok){licSet({...L,name:r.name,expires:r.expires,checked:Date.now()});if(view.screen==='home')render()}
+    else if(r&&r.reason){licSet(null);gate(r.reason)}
+  }catch(e){if(Date.now()-(L.checked||0)>14*864e5)gate('offline')}
+}
+
 /* ============ 화면 ============ */
 const STEP_NAMES=['생각 열기','질문 만들기','개요 짜기','글쓰기','빨간펜 첨삭','늘리고 완성'];
 let view={screen:'home',id:null,step:0,sel:-1,ask:'',confirmDel:null,aiBusy:false,aiErr:'',exAI:null,exBusy:false,more:false};
 
 function render(){
+  if(view.screen==='gate'){$('#app').innerHTML=gateHTML();const i=$('#licIn');if(i)i.focus();return}
   $('#app').innerHTML=view.screen==='home'?homeHTML():workHTML();
   markSaved();
   if(view.screen==='work'&&view.step===3)updateMeter();
@@ -1034,10 +1085,10 @@ function homeHTML(){
   const todays=done.filter(w=>dayKey(w.doneAt)===dayKey(Date.now()));
   const works=[...DB.works].sort((a,b)=>b.updated-a.updated);
   const call=DB.name?`${nm}${hasBatchim(DB.name)?'아':'야'}, `:'';
-  const greet=done.length?`${call}벌써 ${done.length}편이나 썼어!<br>오늘도 하나 써 볼까?`:`안녕 ${nm}! 나는 송이야.<br>같이 글 쓰러 가자!`;
+  const greet=done.length?`${call}벌써 ${done.length}편이나 썼어!<br>오늘도 하나 써 볼까?`:(nm?`안녕 ${nm}! 나는 송이야.<br>같이 글 쓰러 가자!`:'안녕! 나는 송이야.<br>먼저 오른쪽 아래에<br>이름을 적어 줘!');
   return `<header class="hero">
-    <div><p class="kicker">생각이 깊어지는 글쓰기 · 1~6학년 논술</p>
-      <h1 class="brand"><span id="nm">${nm}</span>의 <span class="red hl">빨간펜 글쓰기</span></h1>
+    <div><p class="kicker">생각이 깊어지는 글쓰기 · 1~6학년 논술${licLine()?` · <b style="color:var(--coral)">${esc(licLine())}</b>`:''}</p>
+      <h1 class="brand"><span id="nm">${nm||'달달맘'}</span>의 <span class="red hl">빨간펜 글쓰기</span></h1>
       <p class="sub">생각 열고 → <span class="hl-y">처음·가운데·끝</span>으로 쓰고 → <span class="hl">빨간펜</span>으로 고치고 <span class="hl-g">쑥쑥 늘리기</span>!</p></div>
     <div class="hero-c"><div class="bubble b">${greet}</div><span class="doodle d1">슥슥~</span>
       <span class="pair">${ch('mongi','happy','bob')}${ch('songi','cheer')}</span></div>
@@ -1052,7 +1103,7 @@ function homeHTML(){
     <div class="statbox">
       <div><b class="tnum">${done.length}<small style="font-size:22px;color:var(--ink-3)">편</small></b><span>완성한 글</span></div>
       <div><b class="tnum">${starsTotal}</b><span>모은 별 ★</span></div>
-      <div class="who"><label for="kidName">이름</label><input id="kidName" maxlength="10" value="${nm}" placeholder="이름 쓰기" autocomplete="off" data-inp="name"></div>
+      <div class="who"><label for="kidName">이름</label><input id="kidName" maxlength="10" value="${nm}" placeholder="아이 이름" autocomplete="off" data-inp="name"></div>
     </div>
   </div>
   <div class="today${todays.length?'':' none'}">
@@ -1377,13 +1428,14 @@ document.addEventListener('click',ev=>{
     case 'delNo':view.confirmDel=null;render();break;
     case 'delYes':DB.works=DB.works.filter(x=>x.id!==b.dataset.id);view.confirmDel=null;persist();render();toast('글을 지웠어요');break;
     case 'mom':{const x=DB.works.find(x=>x.id===b.dataset.id);if(x)sendMom(x);break}
-    case 'todayMom':{const ws=DB.works.filter(x=>x.done&&dayKey(x.doneAt)===dayKey(Date.now()));openSend(dayMsg(ws),'오늘 쓴 글을 엄마에게 보내자!',`${DB.name}_오늘의글_${new Date().toISOString().slice(0,10)}.txt`);break}
+    case 'todayMom':{const ws=DB.works.filter(x=>x.done&&dayKey(x.doneAt)===dayKey(Date.now()));openSend(dayMsg(ws),'오늘 쓴 글을 엄마에게 보내자!',`${DB.name||'글쓰기'}_오늘의글_${new Date().toISOString().slice(0,10)}.txt`);break}
     case 'step':goStep(+b.dataset.s);break;
     case 'next':goStep(Math.min(5,view.step+1));break;
     case 'prev':goStep(Math.max(0,view.step-1));break;
+    case 'licGo':licGo();break;
     case 'photo':openPhoto(w);break;
     case 'printSheet':doPrint(worksheetHTML(w),`활동지_${topicOf(w).title.slice(0,16)}.html`,topicOf(w).title+' 활동지');break;
-    case 'printFinal':doPrint(finalPrintHTML(w),`${DB.name}_${(w.title||topicOf(w).title).slice(0,16)}_인쇄.html`,w.title||topicOf(w).title);break;
+    case 'printFinal':doPrint(finalPrintHTML(w),`${DB.name||'글쓰기'}_${(w.title||topicOf(w).title).slice(0,16)}_인쇄.html`,w.title||topicOf(w).title);break;
     case 'more':view.more=true;view.sel=-1;render();break;
     case 'addWord':{const i=$('#wordIn');const v=i.value.trim();if(!v)return;w.words=[...(w.words||[]),v];touch(w);render();$('#wordIn').focus();break}
     case 'rmWord':w.words.splice(+b.dataset.i,1);touch(w);render();break;
@@ -1410,13 +1462,13 @@ document.addEventListener('click',ev=>{
     case 'addPara':{const s=MORE[w.type][+b.dataset.i][1];w.text=(w.text||'').replace(/\s+$/,'')+'\n\n'+s;touch(w);goStep(3);
       setTimeout(()=>{const d=$('#draft');if(d){d.focus();d.setSelectionRange(d.value.length,d.value.length);d.scrollTop=d.scrollHeight}},30);break}
     case 'finish':{if(!w.firstLen)w.firstLen=countChars(w.text);w.done=true;w.doneAt=Date.now();w.fb=analyze(w.text,w.grade,w.type);w.fb.textSnap=w.text;view.more=false;view.sel=-1;touch(w);persist();render();window.scrollTo({top:0});toast('완성! 이 기기에 저장했어요');break}
-    case 'saveTxt':saveFile(`${DB.name}_${(w.title||topicOf(w).title).slice(0,20)}.txt`,`${w.title||topicOf(w).title}\n${w.grade}학년 ${DB.name} · ${today()}\n\n${w.text.trim()}\n`,'text/plain');break;
-    case 'backup':saveFile(`${DB.name}_글쓰기_백업_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(DB,null,1),'application/json');break;
+    case 'saveTxt':saveFile(`${DB.name||'글쓰기'}_${(w.title||topicOf(w).title).slice(0,20)}.txt`,`${w.title||topicOf(w).title}\n${w.grade}학년 ${DB.name} · ${today()}\n\n${w.text.trim()}\n`,'text/plain');break;
+    case 'backup':saveFile(`${DB.name||'글쓰기'}_글쓰기_백업_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(DB,null,1),'application/json');break;
   }
 });
 document.addEventListener('input',ev=>{
   const el=ev.target;const k=el.dataset.inp;if(!k)return;
-  if(k==='name'){DB.name=el.value.trim()||'지호';const nm=$('#nm');if(nm)nm.textContent=DB.name;saveSoon();return}
+  if(k==='name'){DB.name=el.value.trim();const nm=$('#nm');if(nm)nm.textContent=DB.name||'달달맘';saveSoon();return}
   const w=curWork();if(!w)return;
   if(k==='text'){w.text=el.value;updateMeter()}
   else if(k==='web'){w.web={...(w.web||{}),[el.dataset.k]:el.value}}
@@ -1426,6 +1478,7 @@ document.addEventListener('input',ev=>{
   touch(w);
 });
 document.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'&&ev.target.id==='licIn'){ev.preventDefault();licGo()}
   if(ev.key==='Enter'&&ev.target.id==='wordIn'){ev.preventDefault();$('[data-act="addWord"]').click()}
   if((ev.key==='Enter'||ev.key===' ')&&ev.target.classList&&ev.target.classList.contains('sent')){ev.preventDefault();ev.target.click()}
   if(ev.key==='Escape'&&$('#layer').innerHTML)closeModal();
@@ -1436,7 +1489,7 @@ document.addEventListener('change',ev=>{
     const ids=new Set(DB.works.map(w=>w.id));let n=0;d.works.forEach(w=>{if(!ids.has(w.id)){DB.works.push(w);n++}});persist();render();toast(`${n}편을 불러왔어요`)}catch(e){toast('글쓰기 백업 파일이 아니에요')}};r.readAsText(f);
 });
 
-render();
+boot();
 if(document.readyState==='complete')initCaps();else window.addEventListener('load',initCaps);
 </script>
 </body></html>
