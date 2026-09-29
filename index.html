@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>글 따라 송이송이</title>
+<title>달달맘의 글분석 학습지</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Gowun+Dodum&display=swap">
@@ -313,7 +313,9 @@ const starsHtml = (n, cls = 'stars') => `<span class="${cls}" aria-label="별 ${
 const KEY = 'geulsong-v1';
 let store = {};
 try { store = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { store = {}; }
-let prefs = Object.assign({ g: 'lo', onlyNew: false, name: '지호' }, store._prefs || {});
+let prefs = Object.assign({ g: 'lo', onlyNew: false, kid: '' }, store._prefs || {});
+delete prefs.name;
+const kidName = () => (prefs.kid || '').trim();
 if (!Array.isArray(store._log)) store._log = [];
 function save(){ try { store._prefs = prefs; localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
 
@@ -519,11 +521,11 @@ function oneMsg(r, full){
   return lines.join('\n');
 }
 function resultMsg(r){
-  return `💌 ${prefs.name || '지호'}의 글 따라 송이송이 결과\n${dstr(r.t)}\n\n${oneMsg(r, true)}`;
+  return `💌 [달달맘의 글분석 학습지] ${kidName() || '우리 아이'} 결과\n${dstr(r.t)}\n\n${oneMsg(r, true)}`;
 }
 function dayMsg(rs){
   const sum = rs.reduce((a, r) => a + r.score, 0), tot = rs.reduce((a, r) => a + r.total, 0);
-  return `💌 ${prefs.name || '지호'}의 오늘 공부 (${dstr(rs[rs.length-1].t).split(' ').slice(0,2).join(' ')})\n학습지 ${rs.length}편 · 모두 ${sum}/${tot}점\n\n${rs.map(r => oneMsg(r, false)).join('\n')}`;
+  return `💌 [달달맘의 글분석 학습지] ${kidName() || '우리 아이'} 오늘 공부 (${dstr(rs[rs.length-1].t).split(' ').slice(0,2).join(' ')})\n학습지 ${rs.length}편 · 모두 ${sum}/${tot}점\n\n${rs.map(r => oneMsg(r, false)).join('\n')}`;
 }
 function openSend(text, title){
   const old = $('#sendDlg'); if (old) old.remove();
@@ -567,14 +569,15 @@ function renderHome(){
   const done = DATA.filter(d => store[d.n]);
   const starsTotal = done.reduce((a, d) => a + (store[d.n].stars || 0), 0);
   const list = DATA.filter(d => d.g === prefs.g && (!prefs.onlyNew || !store[d.n]));
-  const nm = esc(prefs.name || '지호');
+  const nm = esc(kidName());
   const today = store._log.filter(r => dayKey(r.t) === dayKey(Date.now()));
-  const greet = done.length ? `${nm}${hasBatchim(prefs.name || '지호') ? '아' : '야'}, 벌써 ${done.length}편이나 읽었어!<br>오늘도 하나 해 볼까?` : `안녕 ${nm}! 나는 송이야.<br>같이 글 읽으러 가자!`;
+  const call = nm ? `${nm}${hasBatchim(kidName()) ? '아' : '야'}, ` : '';
+  const greet = !nm ? '안녕! 나는 송이야.<br>먼저 오른쪽 아래에<br>이름을 적어 줘!' : done.length ? `${call}벌써 ${done.length}편이나 읽었어!<br>오늘도 하나 해 볼까?` : `안녕 ${nm}! 나는 송이야.<br>같이 글 읽으러 가자!`;
   $('#app').innerHTML = `
     <header class="hero">
       <div>
         <p class="kicker">독서디딤돌 · 글 분석 학습지 100편</p>
-        <h1 class="brand">글 따라 <span class="red hl">송이송이</span></h1>
+        <h1 class="brand">달달맘의 <span class="red hl">글분석 학습지</span></h1>
         <p class="sub">읽고 → 문단 나누고 → <span class="hl-y">중심 문장</span>이랑 <span class="hl-g">근거</span>까지 찾아보자!</p>
       </div>
       <div class="hero-c">
@@ -595,7 +598,7 @@ function renderHome(){
       <div class="statbox">
         <div><b class="tnum">${done.length}<small style="font-size:22px;color:var(--ink-3)">/100</small></b><span>푼 학습지</span></div>
         <div><b class="tnum">${starsTotal}</b><span>모은 별 ★</span></div>
-        <div class="who"><label for="kidName">이름</label><input id="kidName" maxlength="10" value="${nm}" autocomplete="off"></div>
+        <div class="who"><label for="kidName">이름</label><input id="kidName" maxlength="10" value="${nm}" placeholder="이름 쓰기" autocomplete="off"></div>
       </div>
     </div>
     <div class="today${today.length ? '' : ' none'}">
@@ -618,7 +621,7 @@ function renderHome(){
   $('#g-lo').onclick = () => { prefs.g = 'lo'; save(); renderHome(); };
   $('#g-hi').onclick = () => { prefs.g = 'hi'; save(); renderHome(); };
   $('#onlyNew').onchange = e => { prefs.onlyNew = e.target.checked; save(); renderHome(); };
-  $('#kidName').onchange = e => { prefs.name = e.target.value.trim() || '지호'; save(); renderHome(); };
+  $('#kidName').onchange = e => { prefs.kid = e.target.value.trim(); save(); renderHome(); };
   const tm = $('#todayMom'); if (tm) tm.onclick = () => openSend(dayMsg(today), '오늘 공부한 걸 엄마에게 보내자!');
   document.querySelectorAll('.tile').forEach(b => b.onclick = () => openSheet(+b.dataset.n));
 }
