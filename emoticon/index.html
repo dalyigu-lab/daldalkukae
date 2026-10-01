@@ -182,6 +182,18 @@ input[type=range]{accent-color:var(--coral)}
 .pk canvas{width:100%;height:100%}
 .pk span{position:absolute;bottom:1px;left:0;right:0;text-align:center;font-family:var(--f-text);font-size:10px;color:var(--ink-2)}
 .pk[aria-pressed="true"]{border-color:var(--coral);background:var(--pink-soft)}
+#live{pointer-events:none}
+.ring{position:absolute;border:1.5px solid rgba(52,42,42,.7);box-shadow:0 0 0 1px rgba(255,255,255,.8);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%)}
+.brushes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.bru{display:flex;flex-direction:column;align-items:stretch;gap:0;border:2px solid #E4DADA;background:#fff;border-radius:8px;padding:3px 4px 2px;transition:border-color .15s,transform .1s}
+.bru:hover{border-color:var(--ink);transform:translateY(-1px)}
+.bru[aria-pressed="true"]{border-color:var(--coral);background:var(--pink-soft)}
+.bru canvas{width:100%;height:40px}
+.bru span{font-size:16px;font-weight:700;line-height:1.1;text-align:center}
+.sizeprev{width:100%;height:auto;aspect-ratio:4/1;border:1.5px dashed var(--line);border-radius:6px;cursor:pointer;background:#fff}
+.mini{font-family:var(--f-text);font-size:12px;color:var(--ink-2)}
+.sw.custom{position:relative;overflow:hidden;background:conic-gradient(#F28F8F,#F5D36B,#9BD08A,#8EC7EA,#A99BE0,#F28F8F)}
+.sw.custom input{position:absolute;inset:-6px;opacity:0;cursor:pointer;width:44px;height:44px}
 .capin{width:100%;font-family:var(--f-hand);font-size:20px;font-weight:700;border:2px dashed var(--peach-b);border-radius:8px;padding:5px 10px;background:var(--peach)}
 
 /* ⑤ 점검 & ⑥ 제출 */
@@ -257,12 +269,14 @@ input[type=range]{accent-color:var(--coral)}
       <div class="cw" id="cw">
         <canvas id="guide" width="740" height="640"></canvas>
         <canvas id="draw" width="740" height="640"></canvas>
+        <canvas id="live" width="740" height="640"></canvas>
+        <div class="ring" id="ring" hidden></div>
         <div class="safe" aria-hidden="true"></div>
         <div class="capprev" id="capPrev"></div>
       </div>
       <div class="hint" id="hint"></div>
       <div class="tools" role="toolbar" aria-label="그리기 도구">
-        <button class="tool" data-tool="pen" aria-pressed="true" title="연필"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></button>
+        <button class="tool" data-tool="pen" aria-pressed="true" title="그리기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></button>
         <button class="tool" data-tool="eraser" aria-pressed="false" title="지우개"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 20h12M5 15l8-9 6 6-7 8H9z"/></svg></button>
         <button class="tool" data-tool="fill" aria-pressed="false" title="색 채우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l7-7 7 7-7 7z"/><path d="M20 16c0 2-1 3-1.5 3S17 18 17 16l1.5-2z"/></svg></button>
         <button class="tool" id="undoBtn" title="되돌리기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7L4 12l5 5M4 12h11a5 5 0 010 10h-2"/></svg></button>
@@ -274,9 +288,15 @@ input[type=range]{accent-color:var(--coral)}
       <div class="answer" id="tipOut" hidden></div>
     </div>
     <div class="panel">
-      <div class="box"><h3>색연필 <small>굵기도 골라요</small></h3>
+      <div class="box"><h3>펜 고르기 <small id="brushName">사인펜</small></h3>
+        <div class="brushes" id="brushes"></div>
+      </div>
+      <div class="box"><h3>굵기 비교 <small>눌러서 골라요</small></h3>
+        <canvas id="sizePrev" class="sizeprev" width="600" height="150" aria-label="굵기 다섯 가지 비교"></canvas>
+        <div class="row"><span class="mini">가늘게</span><input type="range" id="size" min="1" max="40" value="9" aria-label="굵기" style="flex:1"><span class="mini">굵게</span><b class="mini" id="sizeNum">9</b></div>
+      </div>
+      <div class="box"><h3>색 <small>내 색도 만들어요</small></h3>
         <div class="swatches" id="swatches"></div>
-        <div class="row"><span style="font-size:12px">가늘게</span><input type="range" id="size" min="2" max="30" value="7" aria-label="굵기" style="flex:1"><span style="font-size:12px">굵게</span></div>
       </div>
       <div class="box"><h3>밑그림 틀 <small id="guideKind">따라 그릴 모양</small></h3>
         <div class="grid4" id="poses"></div>
@@ -576,11 +596,69 @@ function stampDraw(c,id,x,y,sc){const s=STAMPS.find(s=>s[0]===id);if(!s)return;c
 
 /* ---------- 그림판 ---------- */
 const gc=$('#guide').getContext('2d'),dc=$('#draw').getContext('2d',{willReadFrequently:true});
-let cur=-1,tool='pen',color=INK,size=7,showGuide=true,pending=null,hist=[],redo=[];
-const COLORS=['#23262F','#7A8091','#E04848','#F28F8F','#F5A65B','#F5D36B','#9BD08A','#7DBFB6','#8EC7EA','#A99BE0','#8B5E3C','#FFFFFF'];
-COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.style.background=c;b.setAttribute('aria-label','색');b.setAttribute('aria-pressed',c===color);
-  b.onclick=()=>{color=c;document.querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed',x===b));if(tool==='eraser')setTool('pen')};$('#swatches').appendChild(b)});
-$('#size').oninput=e=>size=+e.target.value;
+let cur=-1,tool='pen',color=INK,size=9,showGuide=true,pending=null,hist=[],redo=[],brush='marker';
+const COLORS=['#23262F','#7A8091','#E04848','#F28F8F','#FFC6D4','#F5A65B','#F5D36B','#FFF1A8','#9BD08A','#7DBFB6','#8EC7EA','#4568CF','#A99BE0','#8B5E3C','#F3D9C0','#FFFFFF'];
+
+function pickColor(c,btn){color=c;document.querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed',x===btn));if(tool!=='pen'&&tool!=='fill')setTool('pen');drawBrushPreviews();drawSizePrev()}
+COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.style.background=c;b.setAttribute('aria-label','색 '+c);b.setAttribute('aria-pressed',c===color);b.onclick=()=>pickColor(c,b);$('#swatches').appendChild(b)});
+{const b=document.createElement('label');b.className='sw custom';b.title='내 색 만들기';b.innerHTML='<input type="color" id="myColor" value="#F28F8F" aria-label="내 색 만들기">';$('#swatches').appendChild(b);
+ b.querySelector('input').oninput=e=>pickColor(e.target.value,b)}
+
+/* ---------- 펜 엔진: 연필·사인펜·색연필·크레용·붓·수채화·물감·형광펜·스프레이·반짝이 ---------- */
+const BRUSHES=[['pencil','연필'],['marker','사인펜'],['cpencil','색연필'],['crayon','크레용'],['brush','붓'],['water','수채화'],['paint','물감 붓'],['high','형광펜'],['spray','스프레이'],['glitter','반짝이 펜']];
+const LIVE={water:.55,high:.42}; // 겹쳐도 진해지지 않게 따로 그렸다가 합치는 펜
+const lc=$('#live').getContext('2d');
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function rgba(c,a){const n=parseInt(c.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function along(a,b,step,fn){const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),n=Math.max(1,Math.ceil(d/Math.max(.5,step)));for(let i=1;i<=n;i++)fn(a.x+dx*i/n,a.y+dy*i/n)}
+function inDisk(r){const t=Math.random()*Math.PI*2,q=Math.sqrt(Math.random())*r;return[Math.cos(t)*q,Math.sin(t)*q]}
+function seg(c,a,b,w,col,cap){c.strokeStyle=col;c.lineWidth=w;c.lineCap=cap||'round';c.lineJoin='round';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}
+function newStroke(br,sz){const r=Math.max(1,sz*G/2);const st={r,w:r*2};
+  if(br==='paint'){st.bristles=Array.from({length:Math.max(5,Math.round(r/1.6))},()=>{const[x,y]=inDisk(r*.9);return{x,y,w:rnd(r*.25,r*.55),a:rnd(.55,1)}})}
+  return st}
+function dab(c,br,a,b,st,col,first){const r=st.r;c.globalCompositeOperation='source-over';c.globalAlpha=1;
+  switch(br){
+   case 'marker':if(first){c.fillStyle=col;c.beginPath();c.arc(b.x,b.y,r,0,7);c.fill()}else seg(c,a,b,r*2,col);break;
+   case 'pencil':{const rr=Math.max(.7,r*.55);along(a,b,Math.max(.6,rr*.5),(x,y)=>{for(let k=0;k<3;k++){const[dx,dy]=inDisk(rr);c.fillStyle=rgba(col,rnd(.35,.85));c.fillRect(x+dx,y+dy,rnd(.8,1.8),rnd(.8,1.8))}});break}
+   case 'cpencil':along(a,b,Math.max(.8,r*.35),(x,y)=>{const n=Math.ceil(r*1.4)+2;for(let k=0;k<n;k++){const[dx,dy]=inDisk(r);c.fillStyle=rgba(col,rnd(.2,.55));c.fillRect(x+dx,y+dy+dx*.3,rnd(1,2.2),rnd(.8,1.6))}});break;
+   case 'crayon':along(a,b,Math.max(1,r*.4),(x,y)=>{const n=Math.ceil(r*2.2)+3;for(let k=0;k<n;k++){if(Math.random()<.22)continue;const[dx,dy]=inDisk(r);c.fillStyle=rgba(col,rnd(.6,.95));c.fillRect(x+dx,y+dy,rnd(1.5,3.2),rnd(1.5,3.2))}});break;
+   case 'brush':{const sp=first?0:Math.hypot(b.x-a.x,b.y-a.y),target=Math.min(r*2.4,Math.max(r*.8,r*2.4-sp*.6));const w0=st.w;st.w=w0+(target-w0)*.35;
+     const n=Math.max(1,Math.ceil(sp/2));for(let i=1;i<=n;i++){const t=i/n,p={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t},q={x:a.x+(b.x-a.x)*(i-1)/n,y:a.y+(b.y-a.y)*(i-1)/n};seg(c,q,p,w0+(st.w-w0)*t,col)}
+     if(first){c.fillStyle=col;c.beginPath();c.arc(b.x,b.y,st.w/2,0,7);c.fill()}break}
+   case 'water':along(a,b,Math.max(1,r*.25),(x,y)=>{const rr=r*rnd(.9,1.25),g=c.createRadialGradient(x,y,0,x,y,rr);g.addColorStop(0,rgba(col,.55));g.addColorStop(.75,rgba(col,.35));g.addColorStop(1,rgba(col,0));c.fillStyle=g;c.beginPath();c.arc(x,y,rr,0,7);c.fill()});break;
+   case 'paint':st.bristles.forEach(o=>{c.globalAlpha=o.a;seg(c,{x:a.x+o.x,y:a.y+o.y},{x:b.x+o.x,y:b.y+o.y},o.w,col)});c.globalAlpha=1;if(first){c.fillStyle=col;c.beginPath();c.arc(b.x,b.y,r*.8,0,7);c.fill()}break;
+   case 'high':if(first){c.fillStyle=col;c.fillRect(b.x-r*.5,b.y-r*1.2,r,r*2.4)}else{c.save();c.strokeStyle=col;c.lineWidth=r*2.4;c.lineCap='butt';c.lineJoin='round';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();c.restore()}break;
+   case 'spray':{const n=Math.ceil(r*1.3)+4;for(let k=0;k<n;k++){const[dx,dy]=inDisk(r*1.6);c.fillStyle=rgba(col,rnd(.4,.9));c.beginPath();c.arc(b.x+dx,b.y+dy,rnd(.6,1.6),0,7);c.fill()}break}
+   case 'glitter':if(first){c.fillStyle=col;c.beginPath();c.arc(b.x,b.y,r,0,7);c.fill()}else seg(c,a,b,r*2,col);
+     along(a,b,Math.max(3,r*.8),(x,y)=>{if(Math.random()<.5){const[dx,dy]=inDisk(r*.8);c.fillStyle=Math.random()<.5?'rgba(255,255,255,.95)':['#FFD66B','#F5A3B7','#BFE3FF','#FFFFFF'][Math.floor(Math.random()*4)];const z=rnd(.8,2.2);c.fillRect(x+dx-z/2,y+dy-z/2,z,z)}});
+     if(Math.random()<.12){const[dx,dy]=inDisk(r*1.4),x=b.x+dx,y=b.y+dy,z=rnd(3,6);c.fillStyle='#FFD66B';c.beginPath();c.moveTo(x,y-z);c.quadraticCurveTo(x,y,x+z,y);c.quadraticCurveTo(x,y,x,y+z);c.quadraticCurveTo(x,y,x-z,y);c.quadraticCurveTo(x,y,x,y-z);c.fill()}break;
+  }}
+/* 보기용 그림(펜 버튼·굵기 비교) */
+const tmp=document.createElement('canvas');
+function brushDemo(ctx,br,sz,col,x0,x1,yc,amp){const pts=[];for(let i=0;i<=24;i++){const t=i/24;pts.push({x:x0+(x1-x0)*t,y:yc+Math.sin(t*Math.PI*2)*amp})}
+  let c=ctx;if(LIVE[br]){tmp.width=ctx.canvas.width;tmp.height=ctx.canvas.height;c=tmp.getContext('2d');c.clearRect(0,0,tmp.width,tmp.height)}
+  const st=newStroke(br,sz);dab(c,br,pts[0],pts[0],st,col,true);for(let i=1;i<pts.length;i++)dab(c,br,pts[i-1],pts[i],st,col,false);
+  if(LIVE[br]){ctx.globalAlpha=LIVE[br];ctx.drawImage(tmp,0,0);ctx.globalAlpha=1}}
+function drawBrushPreviews(){document.querySelectorAll('.bru canvas').forEach(cv=>{const c=cv.getContext('2d');c.clearRect(0,0,cv.width,cv.height);
+  const col=color.toUpperCase()==='#FFFFFF'?'#7A8091':color;c.save();c.scale(.5,.5);brushDemo(c,cv.dataset.b,12,col,24,cv.width*2-24,cv.height,12);c.restore()})}
+const SIZES=[2,5,9,16,28];
+function drawSizePrev(){const cv=$('#sizePrev'),c=cv.getContext('2d');c.clearRect(0,0,cv.width,cv.height);const col=color.toUpperCase()==='#FFFFFF'?'#7A8091':color,cw=cv.width/5;
+  SIZES.forEach((sz,i)=>{if(Math.abs(sz-size)<=1){c.fillStyle='#FDE7ED';c.fillRect(i*cw+3,3,cw-6,cv.height-6)}
+    c.save();brushDemo(c,brush,sz,col,i*cw+18,i*cw+cw-18,62,12);c.restore();
+    c.fillStyle='#6C5F5F';c.font='bold 26px Gaegu, sans-serif';c.textAlign='center';c.fillText(['아주 가늘게','가늘게','보통','굵게','아주 굵게'][i],i*cw+cw/2,cv.height-12)});
+  $('#sizeNum').textContent=size;updRing()}
+$('#sizePrev').onclick=e=>{const r=e.currentTarget.getBoundingClientRect(),i=Math.min(4,Math.floor((e.clientX-r.left)/r.width*5));size=SIZES[i];$('#size').value=size;drawSizePrev()};
+$('#size').oninput=e=>{size=+e.target.value;drawSizePrev()};
+BRUSHES.forEach(([id,name])=>{const b=document.createElement('button');b.className='bru';b.dataset.brush=id;b.setAttribute('aria-pressed',id===brush);
+  b.innerHTML=`<canvas width="160" height="44" data-b="${id}"></canvas><span>${name}</span>`;
+  b.onclick=()=>{brush=id;document.querySelectorAll('.bru').forEach(x=>x.setAttribute('aria-pressed',x===b));$('#brushName').textContent=name;setTool('pen');drawSizePrev()};$('#brushes').appendChild(b)});
+
+/* 실제 크기 동그라미 */
+const ring=$('#ring');
+function updRing(){const cw=$('#cw').getBoundingClientRect(),k=cw.width/W,r=tool==='eraser'?size*G:size*G/2*(brush==='spray'?1.6:brush==='high'?1.2:1);const d=Math.max(4,r*2*k);ring.style.width=ring.style.height=d+'px'}
+$('#cw').addEventListener('pointermove',e=>{if(tool==='fill'||pending){ring.hidden=true;return}const r=$('#cw').getBoundingClientRect();ring.hidden=false;ring.style.left=(e.clientX-r.left)+'px';ring.style.top=(e.clientY-r.top)+'px';updRing()});
+$('#cw').addEventListener('pointerleave',()=>ring.hidden=true);
+
 STAMPS.forEach(([id,name])=>{const b=document.createElement('button');b.className='pk';b.dataset.stamp=id;const cv=document.createElement('canvas');cv.width=cv.height=96;
   stampDraw(cv.getContext('2d'),id,48,40,.95);b.appendChild(cv);b.insertAdjacentHTML('beforeend',`<span>${name}</span>`);
   b.onclick=()=>{pending=pending===id?null:id;syncPicks();hint(pending?`그림판에서 '${name}'을(를) 찍을 곳을 콕!`:'',!!pending)};$('#stamps').appendChild(b)});
@@ -595,7 +673,7 @@ function syncPicks(){const s=state.slots[cur];if(!s)return;
   document.querySelectorAll('[data-stamp]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.stamp===pending))}
 function hint(t,on){$('#hint').textContent=t||'연한 틀을 따라 그려요. 틀은 저장할 때 사라져요.';$('#hint').classList.toggle('on',!!on)}
 function paintGuide(){gc.clearRect(0,0,W,H);const s=state.slots[cur];if(showGuide&&s)drawGuide(gc,s.guide||defGuide(),s.dir)}
-function setTool(t){tool=t;pending=null;syncPicks();hint(t==='fill'?'색칠할 곳을 콕! 선이 이어져 있어야 해요':'',t==='fill');document.querySelectorAll('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t))}
+function setTool(t){tool=t;pending=null;syncPicks();hint(t==='fill'?'색칠할 곳을 콕! 선이 이어져 있어야 해요':t==='eraser'?'지우개는 동그라미 크기만큼 지워져요':'',t==='fill');document.querySelectorAll('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t))}
 document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
 $('#guideBtn').onclick=e=>{showGuide=!showGuide;e.currentTarget.setAttribute('aria-pressed',showGuide);paintGuide()};
 function snap(){hist.push(dc.getImageData(0,0,W,H));if(hist.length>25)hist.shift();redo=[]}
@@ -608,14 +686,20 @@ function commit(){const s=state.slots[cur];if(s){s.img=blank()?null:$('#draw').t
 function persist(){clearTimeout(saveT);saveT=setTimeout(commit,300)}
 const cvEl=$('#draw');let drawing=false,last=null;
 const pos=e=>{const r=cvEl.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}};
+let stroke=null;
 cvEl.addEventListener('pointerdown',e=>{const p=pos(e);
   if(pending){snap();stampDraw(dc,pending,p.x,p.y,G*1.25*(size>14?1.4:size<4?.8:1));persist();return}
   if(tool==='fill'){snap();flood(Math.round(p.x),Math.round(p.y),color);persist();return}
-  snap();drawing=true;last=p;cvEl.setPointerCapture(e.pointerId);dc.globalCompositeOperation=tool==='eraser'?'destination-out':'source-over';
-  dc.fillStyle=color;dc.beginPath();dc.arc(p.x,p.y,size*G/2*(tool==='eraser'?2:1),0,Math.PI*2);dc.fill()});
-cvEl.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);dc.strokeStyle=color;dc.lineWidth=size*G*(tool==='eraser'?2:1);dc.lineCap='round';dc.lineJoin='round';
-  dc.beginPath();dc.moveTo(last.x,last.y);dc.quadraticCurveTo(last.x,last.y,(last.x+p.x)/2,(last.y+p.y)/2);dc.lineTo(p.x,p.y);dc.stroke();last=p});
-const end=()=>{if(!drawing)return;drawing=false;dc.globalCompositeOperation='source-over';persist()};
+  snap();drawing=true;last=p;cvEl.setPointerCapture(e.pointerId);
+  if(tool==='eraser'){dc.globalCompositeOperation='destination-out';dc.fillStyle='#000';dc.beginPath();dc.arc(p.x,p.y,size*G,0,7);dc.fill();return}
+  stroke=newStroke(brush,size);const c=LIVE[brush]?lc:dc;if(LIVE[brush]){lc.clearRect(0,0,W,H);$('#live').style.opacity=LIVE[brush]}
+  dab(c,brush,p,p,stroke,color,true)});
+cvEl.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);
+  if(tool==='eraser'){dc.globalCompositeOperation='destination-out';seg(dc,last,p,size*G*2,'#000');last=p;return}
+  dab(LIVE[brush]?lc:dc,brush,last,p,stroke,color,false);last=p});
+const end=()=>{if(!drawing)return;drawing=false;
+  if(tool!=='eraser'&&LIVE[brush]){dc.globalCompositeOperation='source-over';dc.globalAlpha=LIVE[brush];dc.drawImage($('#live'),0,0);dc.globalAlpha=1;lc.clearRect(0,0,W,H)}
+  dc.globalCompositeOperation='source-over';persist()};
 cvEl.addEventListener('pointerup',end);cvEl.addEventListener('pointercancel',end);
 function flood(x,y,col){const img=dc.getImageData(0,0,W,H),d=img.data,n=parseInt(col.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;
   if(x<0||y<0||x>=W||y>=H)return;const i0=(y*W+x)*4,tr=d[i0],tg=d[i0+1],tb=d[i0+2],ta=d[i0+3];
@@ -636,7 +720,7 @@ function flood(x,y,col){const img=dc.getImageData(0,0,W,H),d=img.data,n=parseInt
 function openEditor(i){cur=i;const s=state.slots[i];hist=[];redo=[];pending=null;buildPoses();
   $('#edNo').textContent=(i+1)+'번';$('#edWhat').textContent=s.label;$('#edCap').value=s.caption;$('#capPrev').textContent=s.caption;$('#tipOut').hidden=true;
   dc.clearRect(0,0,W,H);if(s.img){const im=new Image();im.onload=()=>dc.drawImage(im,0,0,W,H);im.src=s.img}
-  paintGuide();syncPicks();setTool(tool==='fill'?'pen':tool);$('#editor').hidden=false;$('#editor').scrollTop=0;document.body.style.overflow='hidden';lightAI()}
+  paintGuide();syncPicks();setTool(tool==='fill'?'pen':tool);$('#editor').hidden=false;requestAnimationFrame(()=>{drawBrushPreviews();drawSizePrev()});$('#editor').scrollTop=0;document.body.style.overflow='hidden';lightAI()}
 function closeEditor(){clearTimeout(saveT);commit();$('#editor').hidden=true;document.body.style.overflow='';render()}
 $('#backBtn').onclick=closeEditor;
 $('#prevBtn').onclick=()=>{const n=(cur+23)%24;clearTimeout(saveT);commit();openEditor(n)};
