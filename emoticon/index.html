@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style></head><body>
+<title>지호의 이모티콘 학교</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Gowun+Dodum&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+/* 「달달맘의 글분석 학습지」·「지호의 빨간펜 글쓰기」와 같은 디자인: 흰 종이 만화 카드, 손글씨, 형광펜, 같은 색 토큰.
+   Layout: 왼쪽 달달쌤 말풍선(고정) + 오른쪽 단계 카드, 위에 동그라미 번호 단계 레일 */
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --ink:#342A2A; --ink-2:#6C5F5F; --ink-3:#A89B9B;
+  --pink:#F5A3B7; --pink-soft:#FDE7ED; --pink-b:#EE9DB1;
+  --lav:#F6E3F4; --lav-b:#E2A6D7;
+  --lime:#EAF7CB; --peach:#FFF3E6; --peach-b:#F7CDA4;
+  --blue:#4568CF; --blue-soft:#EAF0FC; --coral:#E3544B;
+  --hl:#FFD2DC; --hl-y:#FFE7A3; --hl-g:#D9F0B8;
+  --ok:#3E9B58; --ok-soft:#E8F6DF; --bad:#E3544B;
+  --rule:#EDF0F8; --line:#E6DCDC;
+  --f-hand:'Gaegu','Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --f-pen:'Nanum Pen Script','Gaegu','Apple SD Gothic Neo',cursive;
+  --f-text:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink)}
+body{word-break:keep-all;overflow-wrap:anywhere;font-family:var(--f-hand);font-size:19px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--ink)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-hand);font-weight:700;text-wrap:balance;margin:0;line-height:1.1}
+p{margin:0}
+a{color:var(--blue)}
+.wrap{max-width:1160px;margin:0 auto;padding-inline:16px;padding-block:18px 56px}
+.hl{background:linear-gradient(to bottom,transparent 55%,var(--hl) 55%,var(--hl) 92%,transparent 92%);padding:0 3px}
+.hl-y{background:linear-gradient(to bottom,transparent 55%,var(--hl-y) 55%,var(--hl-y) 92%,transparent 92%);padding:0 3px}
+.hl-g{background:linear-gradient(to bottom,transparent 55%,var(--hl-g) 55%,var(--hl-g) 92%,transparent 92%);padding:0 3px}
+.red{color:var(--coral)}
+.doodle{font-family:var(--f-pen);color:var(--coral);font-size:24px;line-height:1;display:inline-block;transform:rotate(-8deg);white-space:nowrap}
+.chr{display:block;flex:none;width:110px}
+.chr svg{display:block;width:100%;height:auto;overflow:visible}
+.bob{animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.circ{display:inline-grid;place-items:center;width:34px;height:34px;border:2.5px solid var(--ink);border-radius:50%;font-size:20px;flex:none;line-height:1}
+
+/* 머리 */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:12px}
+.kicker{font-size:17px;color:var(--ink-2)}
+.top h1{font-size:clamp(40px,7vw,64px);letter-spacing:-.02em;line-height:1;margin-top:4px}
+.top .sub{font-size:20px;font-weight:700;margin-top:8px}
+.top .doodle{margin-bottom:12px}
+
+/* 단계 레일 */
+.rail-wrap{overflow-x:auto;margin-bottom:18px;scrollbar-width:thin}
+.steps{display:flex;gap:6px;margin:0;padding:2px 2px 6px;min-width:max-content}
+.st{font-size:18px;padding:2px 14px 2px 4px;border-radius:999px;border:2px solid #E6DEDE;color:var(--ink-3);white-space:nowrap;display:inline-flex;gap:6px;align-items:center;background:#fff;transition:transform .12s}
+.st:hover{transform:translateY(-2px)}
+.st b{display:inline-grid;place-items:center;width:26px;height:26px;border:2px solid currentColor;border-radius:50%;font-size:16px}
+.st[aria-current="step"]{border-color:var(--coral);color:var(--coral);background:var(--pink-soft);font-weight:700}
+.st.done{color:var(--ink);border-color:var(--ink-3)}
+.st.done b{border-color:var(--coral);color:var(--coral)}
+
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr);gap:14px}}
+
+/* 달달쌤 */
+.teacher{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:10px}
+@media (max-width:860px){.teacher{position:static}}
+.tface{display:flex;gap:8px;align-items:flex-end}
+.tface .chr{width:104px}
+.tname h3{font-size:30px}
+.tname small{display:block;font-family:var(--f-pen);font-size:22px;color:var(--coral);line-height:1.1}
+.bubble{position:relative;background:var(--lime);border:2.5px solid var(--ink);border-radius:26px;padding:14px 18px;font-size:20px;font-weight:700;line-height:1.45}
+.bubble::after{content:'';position:absolute;left:40px;top:-11px;width:18px;height:18px;background:inherit;border-left:2.5px solid var(--ink);border-top:2.5px solid var(--ink);transform:rotate(40deg) skewX(-6deg)}
+.bubble p+p{margin-top:6px}
+.bubble b{color:var(--coral)}
+.ask{display:flex;gap:6px}
+.ask input{flex:1;min-width:0;font-family:var(--f-text);font-size:16px;border:2px dashed var(--peach-b);border-radius:999px;padding:6px 14px;background:var(--peach)}
+.ask input:focus{outline:none;border-style:solid;border-color:var(--coral);background:#fff}
+.answer{background:var(--pink-soft);border:2.5px solid var(--pink-b);border-radius:14px;padding:10px 14px;font-family:var(--f-text);font-size:15.5px;line-height:1.7;white-space:pre-wrap;animation:pop .2s ease}
+.ainote{font-family:var(--f-text);font-size:13px;color:var(--ink-3)}
+.momsend{display:flex;align-items:center;gap:10px;padding:10px 12px;border:2.5px solid var(--pink-b);background:var(--pink-soft);border-radius:10px}
+.momsend > div{flex:1;display:grid}
+.momsend b{font-size:20px} .momsend span{font-size:15px;color:var(--ink-2);font-family:var(--f-text)}
+
+/* 카드 */
+.card{position:relative;background:#fff;border:2.5px solid var(--peach-b);border-radius:6px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px;animation:pop .2s ease;min-width:0}
+.card h2{font-size:34px;display:flex;align-items:center;gap:10px}
+.card h3{font-size:24px}
+.lead{font-family:var(--f-text);font-size:15px;color:var(--ink-2);line-height:1.7}
+.btn{border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:4px 18px;font-size:20px;font-weight:700;transition:transform .12s;display:inline-block;text-decoration:none;color:var(--ink)}
+.btn:hover{transform:translateY(-2px)} .btn:active{transform:none}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
+.btn.primary{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn.ai{background:var(--lime)}
+.btn.sm{font-size:17px;padding:2px 14px;border-width:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.nav{display:flex;gap:8px;justify-content:space-between;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:4px;border:2px solid #E4DADA;background:#fff;border-radius:999px;padding:1px 14px;font-size:19px;font-weight:700;transition:transform .1s,border-color .15s}
+.chip:hover{border-color:var(--ink);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{background:var(--pink-soft);border-color:var(--coral);color:var(--coral)}
+.chip small{font-family:var(--f-pen);font-size:19px;color:var(--ink-3);font-weight:400}
+.field{display:grid;gap:4px;font-size:19px;font-weight:700}
+.field input,.field textarea,.field select{width:100%;font-family:var(--f-text);font-size:16px;font-weight:400;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:7px 10px;background:var(--peach)}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-style:solid;border-color:var(--coral);background:#fff}
+.field textarea{min-height:76px;resize:vertical}
+.status{font-family:var(--f-pen);font-size:22px;color:var(--coral);min-height:1.2em}
+
+/* ① 주제 */
+.topics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.topic{border:2.5px solid var(--line);border-radius:10px;padding:10px 6px;background:#fff;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s,border-color .15s}
+.topic:hover{transform:translateY(-2px);border-color:var(--ink)}
+.topic svg{width:70px;height:70px}
+.topic b{font-size:30px;line-height:1}
+.topic span{font-family:var(--f-pen);font-size:19px;color:var(--ink-3)}
+.topic[aria-pressed="true"]{border-color:var(--coral);background:var(--pink-soft)}
+.topic:nth-child(2)[aria-pressed="true"]{border-color:#E9B04A;background:#FFF6DC}
+.topic:nth-child(3)[aria-pressed="true"]{border-color:var(--lav-b);background:var(--lav)}
+.items{display:flex;flex-wrap:wrap;gap:6px}
+.pick-note{font-family:var(--f-text);font-size:15.5px;line-height:1.75;background:var(--peach);border:2px dashed var(--peach-b);border-radius:6px;padding:10px 14px}
+.pick-note b{font-family:var(--f-hand);font-size:19px}
+
+/* ③ 24개 말 */
+.phr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media (max-width:560px){.phr{grid-template-columns:minmax(0,1fr)}}
+.ph{display:flex;gap:6px;align-items:center;border:2px solid #E4DADA;border-radius:8px;padding:4px 8px;min-width:0;transition:border-color .15s}
+.ph:focus-within{border-color:var(--ink)}
+.ph em{font-style:normal;font-family:var(--f-pen);font-size:22px;color:var(--coral);width:24px;text-align:right;font-variant-numeric:tabular-nums}
+.ph input{min-width:0;border:0;border-bottom:2px dashed var(--peach-b);background:transparent;padding:2px;font-family:var(--f-text);font-size:15.5px}
+.ph input:focus{outline:none;border-bottom-color:var(--coral)}
+.ph input.l{width:38%;font-family:var(--f-hand);font-size:19px;font-weight:700}
+.ph input.c{flex:1}
+
+/* ④ 보드 */
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.board{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cell{background:#fff;border:2px solid #E4DADA;border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0;position:relative;transition:transform .12s,border-color .15s}
+.cell:hover{transform:translateY(-2px);border-color:var(--ink)}
+.cell.has{border-color:var(--pink-b)}
+.cell .no{font-family:var(--f-pen);font-size:19px;color:var(--coral);font-variant-numeric:tabular-nums;line-height:1}
+.cell .thumb{aspect-ratio:740/640;width:100%;max-width:100%;background:#fff;border-radius:4px;border:1.5px dashed var(--line);display:grid;place-items:center;overflow:hidden}
+.cell .thumb img{width:100%;height:100%;object-fit:contain}
+.cell .thumb i{font-style:normal;font-size:32px;color:var(--ink-3)}
+.cell .lab{font-size:18px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .star{position:absolute;top:3px;right:5px;font-family:var(--f-pen);font-size:18px;color:#fff;background:var(--coral);border-radius:999px;padding:0 8px;line-height:1.3}
+.meter{height:12px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:#fff}
+.meter i{display:block;height:100%;background:repeating-linear-gradient(-45deg,var(--pink) 0 8px,#F9BCCB 8px 16px)}
+
+/* 그림판 */
+.editor{position:fixed;inset:0;background:var(--bg);z-index:10;overflow:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.ed{max-width:1060px;margin:0 auto;padding-inline:16px;padding-block:12px 24px;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px}
+@media (max-width:860px){.ed{grid-template-columns:minmax(0,1fr)}}
+.edhead{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.edhead h2{font-size:32px}
+.stage{display:flex;flex-direction:column;gap:8px;min-width:0}
+.cw{position:relative;width:100%;max-width:620px;aspect-ratio:740/640;margin:0 auto;border:2.5px solid var(--blue);border-radius:4px;background:#fff;overflow:hidden;touch-action:none}
+.cw canvas{position:absolute;inset:0;width:100%;height:100%}
+#guide{pointer-events:none}
+.capprev{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-family:var(--f-hand);font-size:clamp(20px,5vw,32px);font-weight:700;color:var(--ink);pointer-events:none;text-shadow:0 0 4px #fff,0 0 4px #fff,0 0 4px #fff}
+.safe{position:absolute;inset:4%;border:1.5px dashed rgba(227,84,75,.35);border-radius:6px;pointer-events:none}
+.hint{text-align:center;font-family:var(--f-pen);font-size:22px;color:var(--ink-2);min-height:1.2em;line-height:1.2}
+.hint.on{color:var(--coral)}
+.tools{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.tool{width:50px;height:50px;border:2px solid var(--ink);border-radius:8px;background:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;line-height:1;padding:2px;transition:transform .1s}
+.tool:hover{transform:translateY(-2px)}
+.tool[aria-pressed="true"]{background:var(--ink);color:#fff}
+.tool svg{width:24px;height:24px}
+.panel{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{background:#fff;border:2.5px solid var(--peach-b);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.box:nth-child(2){border-color:var(--lav-b)} .box:nth-child(3){border-color:var(--pink-b)}
+.box h3{font-size:22px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.box h3 small{font-family:var(--f-pen);font-size:18px;color:var(--coral);font-weight:400}
+input[type=range]{accent-color:var(--coral)}
+.swatches{display:flex;flex-wrap:wrap;gap:6px}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--ink)}
+.sw[aria-pressed="true"]{outline:3px solid var(--coral);outline-offset:2px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.pk{border:2px solid #E4DADA;background:#fff;border-radius:8px;padding:2px;aspect-ratio:1;display:grid;place-items:center;position:relative;transition:border-color .15s}
+.pk:hover{border-color:var(--ink)}
+.pk canvas{width:100%;height:100%}
+.pk span{position:absolute;bottom:1px;left:0;right:0;text-align:center;font-family:var(--f-text);font-size:10px;color:var(--ink-2)}
+.pk[aria-pressed="true"]{border-color:var(--coral);background:var(--pink-soft)}
+.capin{width:100%;font-family:var(--f-hand);font-size:20px;font-weight:700;border:2px dashed var(--peach-b);border-radius:8px;padding:5px 10px;background:var(--peach)}
+
+/* ⑤ 점검 & ⑥ 제출 */
+.checks{display:grid;gap:6px}
+.ck{display:flex;gap:10px;align-items:center;font-size:19px;padding:2px 0}
+.ck input{appearance:none;-webkit-appearance:none;width:26px;height:26px;flex:none;position:relative;border:2.5px solid var(--ink);border-radius:3px;background:#fff;margin:0;cursor:pointer}
+.ck input:checked::after{content:'';position:absolute;left:3px;top:-10px;width:12px;height:22px;border-right:4px solid var(--coral);border-bottom:4px solid var(--coral);transform:rotate(40deg);border-radius:2px}
+.ck.auto b{display:inline-grid;place-items:center;width:26px;height:26px;flex:none;font-size:20px}
+.ok{color:var(--ok)} .no{color:var(--coral)}
+.spec{width:100%;border-collapse:collapse;font-family:var(--f-text);font-size:15px}
+.spec th,.spec td{border-bottom:2px dashed var(--line);padding:6px 4px;text-align:left}
+.spec th{font-family:var(--f-hand);font-size:18px}
+.spec td{font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto}
+.mom{background:var(--lav);border:2.5px solid var(--lav-b);border-radius:6px;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.mom ol{margin:0;padding-left:22px;display:grid;gap:6px;font-family:var(--f-text);font-size:15.5px;line-height:1.7}
+.mom ol b{font-family:var(--f-hand);font-size:18px}
+.mainpick{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.mainpick .field{flex:1 1 200px}
+.mainpick canvas{border:2px solid var(--ink);border-radius:6px;background:#fff;width:96px;height:96px}
+.mainpick canvas.tab{width:96px;height:74px}
+.sheetimg{width:100%;border-radius:6px;border:2px solid var(--line)}
+
+/* 창 */
+.modal{position:fixed;inset:0;background:rgba(52,42,42,.35);z-index:50;display:grid;place-items:center;padding:16px;animation:pop .15s ease}
+.mbox{background:#fff;border:3px solid var(--ink);border-radius:14px;max-width:520px;width:100%;max-height:calc(100% - 8px);overflow:auto;padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px}
+.mbox h2{font-size:28px}
+.mbox textarea{width:100%;min-height:200px;font-family:var(--f-text);font-size:14.5px;line-height:1.6;border:2px dashed var(--peach-b);border-radius:8px;padding:10px;background:var(--peach);resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;border:2.5px solid var(--ink);border-radius:999px;padding:6px 20px;font-size:20px;font-weight:700;z-index:60;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><p class="kicker">네이버 OGQ 스티커 24개 만들기</p>
+    <h1>지호의 <span class="red hl">이모티콘 학교</span></h1>
+    <p class="sub">주제 고르고 → 캐릭터 만들고 → <span class="hl-y">24개 그려서</span> → <span class="hl-g">네이버에 내자!</span></p></div>
+    <span class="doodle">진짜 작가 되기~</span>
+  </header>
+  <div class="rail-wrap"><nav class="steps" id="steps" aria-label="단계"></nav></div>
+
+  <div class="layout">
+    <aside class="teacher" aria-label="달달쌤">
+      <div class="tface"><span class="chr bob" id="tchr"></span>
+        <div class="tname"><h3>달달쌤</h3><small>엄마가 변신한 이모티콘 선생님</small></div>
+      </div>
+      <div class="bubble" id="bubble"></div>
+      <div class="ask" id="askRow" hidden>
+        <input id="askIn" placeholder="쌤한테 물어보기" maxlength="120" aria-label="달달쌤에게 질문">
+        <button class="btn ai" id="askBtn">묻기</button>
+      </div>
+      <div class="answer" id="answer" hidden></div>
+      <div class="momsend"><div><b>엄마에게 보내기</b><span>지금까지 한 걸 엄마한테 알려요</span></div><button class="btn sm" id="momBtn">보내기</button></div>
+      <p class="ainote" id="aiNote" hidden>달달쌤 대답은 Claude가 해 줘요. 처음 물어볼 때 허락 창이 떠요.</p>
+    </aside>
+
+    <main id="main"></main>
+  </div>
+</div>
+
+<!-- 그림판 -->
+<div class="editor" id="editor" hidden>
+  <div class="ed">
+    <div class="edhead">
+      <button class="btn" id="backBtn">← 24칸 보드로</button>
+      <h2 id="edNo">1번</h2>
+      <span id="edWhat" style="font-family:var(--display);font-size:22px;font-weight:700"></span>
+      <span class="spacer"></span>
+      <button class="btn" id="prevBtn" aria-label="이전 칸">◀</button>
+      <button class="btn" id="nextBtn" aria-label="다음 칸">▶</button>
+    </div>
+    <div class="stage">
+      <div class="cw" id="cw">
+        <canvas id="guide" width="740" height="640"></canvas>
+        <canvas id="draw" width="740" height="640"></canvas>
+        <div class="safe" aria-hidden="true"></div>
+        <div class="capprev" id="capPrev"></div>
+      </div>
+      <div class="hint" id="hint"></div>
+      <div class="tools" role="toolbar" aria-label="그리기 도구">
+        <button class="tool" data-tool="pen" aria-pressed="true" title="연필"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></button>
+        <button class="tool" data-tool="eraser" aria-pressed="false" title="지우개"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 20h12M5 15l8-9 6 6-7 8H9z"/></svg></button>
+        <button class="tool" data-tool="fill" aria-pressed="false" title="색 채우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l7-7 7 7-7 7z"/><path d="M20 16c0 2-1 3-1.5 3S17 18 17 16l1.5-2z"/></svg></button>
+        <button class="tool" id="undoBtn" title="되돌리기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7L4 12l5 5M4 12h11a5 5 0 010 10h-2"/></svg></button>
+        <button class="tool" id="redoBtn" title="다시하기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 7l5 5-5 5M20 12H9a5 5 0 000 10h2"/></svg></button>
+        <button class="tool" id="guideBtn" aria-pressed="true" title="틀 보이기">틀<br>보기</button>
+        <button class="tool" id="clearBtn" title="모두 지우기">전부<br>지우기</button>
+      </div>
+      <div class="row" style="justify-content:center"><button class="btn ai" id="tipBtn" hidden>쌤, 이 칸 어떻게 그려요?</button></div>
+      <div class="answer" id="tipOut" hidden></div>
+    </div>
+    <div class="panel">
+      <div class="box"><h3>색연필 <small>굵기도 골라요</small></h3>
+        <div class="swatches" id="swatches"></div>
+        <div class="row"><span style="font-size:12px">가늘게</span><input type="range" id="size" min="2" max="30" value="7" aria-label="굵기" style="flex:1"><span style="font-size:12px">굵게</span></div>
+      </div>
+      <div class="box"><h3>밑그림 틀 <small id="guideKind">따라 그릴 모양</small></h3>
+        <div class="grid4" id="poses"></div>
+        <div class="row" id="dirs" aria-label="얼굴 방향"></div>
+      </div>
+      <div class="box"><h3>표정 도장 <small>고르고 그림판을 콕!</small></h3><div class="grid4" id="stamps"></div></div>
+      <div class="box"><h3>말풍선 글자</h3><input class="capin" id="edCap" maxlength="12"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="momModal" hidden>
+  <div class="mbox"><h2>💌 엄마에게 보내기</h2>
+    <p class="lead">아래 글을 복사해서 엄마 카톡이나 문자로 보내요. 그림은 ⑤ 점검에서 모아보기 그림을 저장해 같이 보내면 돼요.</p>
+    <textarea id="momTxt" readonly aria-label="보낼 글"></textarea>
+    <p class="status" id="momSt"></p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" id="momClose">닫기</button><button class="btn primary" id="momCopy">복사하기</button></div></div>
+</div>
+
+<div class="modal" id="confirmModal" hidden>
+  <div class="mbox"><h2 style="font-size:26px" id="cfTitle"></h2><p id="cfText"></p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" id="cfNo">아니요</button><button class="btn primary" id="cfYes">네</button></div></div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const W=740,H=640,G=2; // OGQ 스티커 크기, 밑그림 좌표 배율
+const STORE='jiho-emoticon-school-v1';
+const STEPS=['주제','캐릭터','24개 말','그리기','점검','제출'];
+
+/* ---------- 책 목차 (지호 책: 귀여운 그림 그리기) ---------- */
+const BOOK={
+ 사람:{icon:'person',sub:'책 2장 · 16쪽',items:[['사람들',18],['경찰',32],['우주 비행사',34],['요리사',36],['카우보이',38],['의사',40],['농부',41],['닌자',42],['선원',44],['마녀',46]],extra:'자세 20쪽 · 표정 22쪽'},
+ 동물:{icon:'animal',sub:'책 3장 · 48쪽',items:[['개',50],['고양이',52],['토끼',53],['코끼리',54],['햄스터',56],['다람쥐',57],['곰',58],['여우',60],['너구리',61],['돼지',62],['거북이',63],['코알라',64],['원숭이',65],['사자',66],['호랑이',67],['오리',73],['부엉이',76],['펭귄',74],['상어',81],['고래',83],['문어',84],['벌',90],['용',92],['유니콘',94]]},
+ 사물:{icon:'thing',sub:'책 4장 · 98쪽',items:[['자동차',108],['비행기',110],['배',112],['빵',115],['솜사탕',116],['피자',117],['햄버거',118],['사탕',119],['디저트',120],['과일',122],['초밥',123],['꽃',124],['나무',126],['텐트',103],['집',100]]}
+};
+const TRAITS=['명랑해','수줍어','장난꾸러기','먹보','잠꾸러기','씩씩해','다정해','엉뚱해','부지런해','느긋해'];
+const MARKS=['볼에 별','머리에 새싹','큰 리본','동그란 안경','하트 꼬리','줄무늬','빨간 볼','작은 왕관'];
+const USERS=['친구랑','가족이랑','엄마아빠랑','선생님께'];
+const DEFAULT_PHRASES=[['안녕','안녕!'],['고마워','고마워~'],['좋아','좋아요!'],['최고','최고야'],['사랑해','사랑해♥'],['축하해','축하해!'],['신나','신난다!'],['응원해','힘내!'],
+ ['슬퍼','흑흑'],['화나','흥!'],['미안해','미안해..'],['싫어','싫어!'],['피곤해','지쳤어'],['헐','헐..'],['깜짝','깜짝이야!'],['부끄러워','부끄..'],
+ ['졸려','졸려..'],['배고파','배고파'],['뭐해','뭐해?'],['기다려','잠깐만!'],['궁금해','왜?'],['오케이','오케이'],['잘자','잘 자~'],['바이','안녕~']];
+
+function fresh(){return{step:0,topic:'',item:'',ownItem:'',char:{name:'',traits:[],likes:'',mark:''},user:'친구랑',
+  slots:DEFAULT_PHRASES.map(p=>({label:p[0],caption:p[1],img:null,guide:null,dir:'front'})),
+  checks:{},main:0,title:'',desc:'',tags:'',prevPhr:null}}
+function load(){try{const r=localStorage.getItem(STORE);if(!r)return null;return Object.assign(fresh(),JSON.parse(r))}catch(e){return null}}
+let saveWarned=false;
+function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){if(!saveWarned){saveWarned=true;say(['이 기기 저장 공간이 꽉 찼어요. 5단계에서 그림을 한 장으로 저장해 두세요.'],'oops')}}}
+let state=load()||fresh();
+const subject=()=>state.topic==='사물'?(state.ownItem||state.item||'물건'):(state.ownItem||state.item||state.topic||'캐릭터');
+
+/* ---------- Claude (달달쌤) ---------- */
+let sample=null, images=false, turns=[];
+const RULES=()=>`너는 8살 초등학생 지호의 이모티콘 선생님 "달달쌤"이야.
+- 초등 1~2학년이 혼자 읽을 수 있게 쉬운 말, 짧은 문장, 다정한 반말로 말해. 3~4문장 이내.
+- 먼저 잘한 점을 하나 칭찬하고, 다음에 할 일은 한 가지만 알려줘.
+- 다른 회사 캐릭터(카카오프렌즈, 포켓몬, 산리오 등)나 책·인터넷 그림을 그대로 베끼면 팔 수 없다는 걸 필요할 때 알려줘. 책은 연습용이고, 파는 캐릭터는 지호가 새로 만든 모습이어야 해.
+- 이름, 주소, 학교, 전화번호 같은 개인정보는 묻지 마. 돈, 가입, 계약 이야기는 "엄마랑 같이 하자"고 말해.
+- 이모티콘은 네이버 OGQ마켓에 낼 거야: 스티커 24개, 한 장에 740x640 크기.
+지금 지호 작업: ${ctx()}`;
+function ctx(){const c=state.char;return `주제=${state.topic||'아직'}(${subject()}), 캐릭터 이름=${c.name||'아직'}, 성격=${c.traits.join(',')||'아직'}, 좋아하는 것=${c.likes||'아직'}, 특징=${c.mark||'아직'}, 쓸 사람=${state.user}, 그린 칸=${state.slots.filter(s=>s.img).length}/24, 지금 단계=${STEPS[state.step]}`}
+function aiErr(e){const m={not_granted:'괜찮아! 쌤 도움 없이도 할 수 있어.',rate_limited:'쌤이 잠깐 쉬는 중이야. 조금 뒤에 다시 물어봐.',session_expired:'엄마한테 다시 로그인해 달라고 해 줘.',refused:'그 질문은 대답하기 어려워. 이모티콘 이야기를 해 볼까?'};
+  if(['not_granted','sampling_disabled','capability_disabled','not_declared','capability_removed'].includes(e?.code)){sample=null;lightAI()}
+  return m[e?.code]||'쌤 대답이 끊겼어. 한 번 더 눌러 볼래?'}
+function lightAI(){const on=!!sample;$('#askRow').hidden=!on;$('#aiNote').hidden=!on;$('#tipBtn').hidden=!on;document.querySelectorAll('[data-ai]').forEach(b=>b.hidden=!on)}
+(async()=>{try{if(!window.claude?.use)return;sample=await window.claude.use('sample');if(sample){const l=await sample.limits().catch(()=>null);images=!!l?.images}lightAI()}catch(e){}})();
+let askCtl;
+$('#askBtn').onclick=async()=>{const q=$('#askIn').value.trim();if(!q||!sample)return;
+  const out=$('#answer');out.hidden=false;out.textContent='달달쌤이 생각하는 중...';$('#askBtn').disabled=true;
+  turns.push({role:'user',content:q});turns=turns.slice(-8);askCtl=new AbortController();
+  try{const{text}=await sample([{role:'user',content:RULES()},{role:'assistant',content:'응, 알겠어!'},...turns],{cache:false,modelTier:'quick',signal:askCtl.signal,onText:({text})=>out.textContent=text});
+    turns.push({role:'assistant',content:text});$('#askIn').value=''}
+  catch(e){out.textContent=e.text||aiErr(e);turns.pop()}finally{$('#askBtn').disabled=false}};
+$('#askIn').onkeydown=e=>{if(e.key==='Enter')$('#askBtn').click()};
+
+
+/* ---------- 달달쌤 (글분석 학습지 송이·몽이와 같은 그림체) ---------- */
+const CI='#342A2A',SW='stroke="'+CI+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
+function eyesC(m,lx,rx,y){
+  if(m==='oops')return `<path d="M${lx-5} ${y-4} l7 4 l-7 4 M${rx+5} ${y-4} l-7 4 l7 4" fill="none" ${SW}/>`;
+  if(m==='cheer')return `<path d="M${lx-5} ${y+2} q5 -8 10 0 M${rx-5} ${y+2} q5 -8 10 0" fill="none" ${SW}/>`;
+  const ry=m==='wow'?8:6.5,rxx=m==='wow'?6:5,dy=m==='think'?-2:0;
+  return [lx,rx].map(x=>`<ellipse cx="${x}" cy="${y+dy}" rx="${rxx}" ry="${ry}" fill="${CI}"/><circle cx="${x+1.8}" cy="${y+dy-2.8}" r="2" fill="#fff"/>`).join('')}
+function mouthC(m,cx,y){
+  if(m==='wow')return `<ellipse cx="${cx}" cy="${y+2}" rx="5" ry="6" fill="#E9707F" ${SW}/>`;
+  if(m==='oops')return `<path d="M${cx-9} ${y+2} q3 -4 6 0 q3 4 6 0 q3 -4 6 0" fill="none" ${SW}/>`;
+  if(m==='think')return `<path d="M${cx-5} ${y+2} h9" fill="none" ${SW}/>`;
+  if(m==='cheer')return `<path d="M${cx-8} ${y-1} q8 13 16 0 z" fill="#E9707F" ${SW}/>`;
+  return `<path d="M${cx-7} ${y} q7 8 14 0" fill="none" ${SW}/>`}
+function extrasC(m){
+  if(m==='wow'||m==='cheer')return `<path d="M106 26 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z" fill="#FFD66B" ${SW}/><path d="M12 40 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z" fill="#F5A3B7" stroke="${CI}" stroke-width="2"/>`;
+  if(m==='oops')return `<path d="M102 44 q6 9 0 13 q-6 -4 0 -13z" fill="#9CC8F2" ${SW}/>`;
+  if(m==='think')return `<text x="100" y="34" font-family="Gaegu,sans-serif" font-weight="700" font-size="30" fill="${CI}">?</text>`;
+  return ''}
+function daldal(m='happy'){ /* 복숭아 핀을 꽂은 똥머리 선생님 엄마 */
+  const arms=m==='cheer'?`<path d="M28 98 q-12 -12 -8 -26" fill="none" ${SW}/><circle cx="20" cy="70" r="6" fill="#FFF3EA" ${SW}/><path d="M92 98 q12 -12 8 -26" fill="none" ${SW}/><circle cx="100" cy="70" r="6" fill="#FFF3EA" ${SW}/>`
+    :`<g transform="rotate(-24 98 92)"><rect x="92" y="70" width="10" height="34" rx="2" fill="#F5A3B7" ${SW}/><path d="M92 104 l5 10 l5 -10z" fill="#FFE3C4" ${SW}/></g>`;
+  return `<svg viewBox="0 0 120 128" aria-hidden="true">${arms}
+    <path d="M34 118 q26 16 52 0 l-6 -18 h-40z" fill="#F5A3B7" ${SW}/>
+    <path d="M52 100 l8 8 l8 -8" fill="#fff" ${SW}/>
+    <circle cx="60" cy="24" r="13" fill="#6B4A3E" ${SW}/>
+    <ellipse cx="60" cy="64" rx="36" ry="36" fill="#6B4A3E" ${SW}/>
+    <circle cx="60" cy="68" r="29" fill="#FFF3EA" ${SW}/>
+    <path d="M30 60 q6 -26 30 -28 q24 2 30 28 q-12 -12 -30 -10 q-6 0 -10 6 q-2 -6 -6 -6 q-8 0 -14 10z" fill="#6B4A3E" ${SW}/>
+    <circle cx="82" cy="30" r="8" fill="#FFB8A6" ${SW}/><path d="M82 22 q4 -6 9 -4 q-3 5 -9 4z" fill="#A6D98A" ${SW}/>
+    <circle cx="48" cy="70" r="9.5" fill="none" ${SW}/><circle cx="72" cy="70" r="9.5" fill="none" ${SW}/><path d="M57.5 70 h5" ${SW}/>
+    ${eyesC(m,48,72,71)}
+    <ellipse cx="38" cy="82" rx="5.5" ry="3.4" fill="#F7A6B8" opacity=".85"/><ellipse cx="82" cy="82" rx="5.5" ry="3.4" fill="#F7A6B8" opacity=".85"/>
+    ${mouthC(m,60,85)}${extrasC(m)}</svg>`}
+function say(lines,mood){$('#bubble').innerHTML=lines.map(l=>`<p>${l}</p>`).join('');$('#tchr').innerHTML=daldal(mood||'happy')}
+
+
+/* ---------- 단계 표시 ---------- */
+function doneOf(i){const s=state;return[!!s.topic&&!!(s.item||s.ownItem),!!s.char.name,s.slots.every(x=>x.label),s.slots.every(x=>x.img),checksDone(),false][i]}
+function renderSteps(){const n=$('#steps');n.innerHTML='';STEPS.forEach((t,i)=>{const b=document.createElement('button');b.className='st'+(doneOf(i)?' done':'');
+  if(i===state.step)b.setAttribute('aria-current','step');b.innerHTML=`<b>${doneOf(i)?'✓':i+1}</b><span>${t}</span>`;b.onclick=()=>go(i);n.appendChild(b)})}
+function go(i){state.step=Math.max(0,Math.min(5,i));save();render();window.scrollTo({top:0})}
+function navHTML(next){return `<div class="nav"><button class="btn" data-prev ${state.step===0?'disabled':''}>← 이전</button><button class="btn primary" data-next>${next||'다음 단계 →'}</button></div>`}
+function wireNav(m){m.querySelector('[data-prev]')?.addEventListener('click',()=>go(state.step-1));m.querySelector('[data-next]')?.addEventListener('click',()=>go(state.step+1))}
+
+function render(){renderSteps();const m=$('#main');[s1,s2,s3,s4,s5,s6][state.step](m);wireNav(m);lightAI()}
+
+/* ---------- 1. 주제 ---------- */
+function topicIcon(k){const st='fill="none" stroke="#23262F" stroke-width="3" stroke-linecap="round"';
+  if(k==='person')return`<svg viewBox="0 0 72 72"><circle cx="36" cy="28" r="18" fill="#fff" stroke="#23262F" stroke-width="3"/><path d="M36 10v36M18 28h36" stroke="#E8A3A2" stroke-width="2"/><path d="M26 46v14h20V46M22 50l-6 6M50 50l6-6" ${st}/></svg>`;
+  if(k==='animal')return`<svg viewBox="0 0 72 72"><ellipse cx="36" cy="42" rx="22" ry="22" fill="#F5D9A8" stroke="#23262F" stroke-width="3"/><circle cx="20" cy="22" r="7" fill="#F5D9A8" stroke="#23262F" stroke-width="3"/><circle cx="52" cy="22" r="7" fill="#F5D9A8" stroke="#23262F" stroke-width="3"/><circle cx="29" cy="38" r="2.5" fill="#23262F"/><circle cx="43" cy="38" r="2.5" fill="#23262F"/><path d="M32 46q4 4 8 0" ${st}/></svg>`;
+  return`<svg viewBox="0 0 72 72"><path d="M36 10 L62 58 H10 Z" fill="#F5D36B" stroke="#23262F" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="42" r="3" fill="#E04848"/><circle cx="44" cy="48" r="3" fill="#E04848"/><circle cx="30" cy="34" r="2.2" fill="#23262F"/><circle cx="42" cy="34" r="2.2" fill="#23262F"/></svg>`}
+function s1(m){
+  say(state.topic?[`<b>${state.topic}</b>를 골랐구나! 이제 아래에서 어떤 ${state.topic==='사물'?'물건':state.topic}을 그릴지 하나 골라 봐.`,'책에 있는 걸 골라도 되고, 지호 마음대로 써도 돼.']
+    :['안녕, 지호야! 나는 달달쌤이야. 오늘부터 지호가 진짜 이모티콘 작가가 되도록 도와줄게.','제일 먼저 할 일은 <b>주제 고르기</b>야. 사람, 동물, 사물 중에 뭘로 만들고 싶어?'],state.topic?'cheer':'happy');
+  const T=state.topic?BOOK[state.topic]:null;
+  m.innerHTML=`<section class="card"><h2><span class="circ">1</span>무엇으로 만들까?</h2>
+   <div class="topics">${Object.entries(BOOK).map(([k,v])=>`<button class="topic" data-topic="${k}" aria-pressed="${state.topic===k}">${topicIcon(v.icon)}<b>${k}</b><span>${v.sub}</span></button>`).join('')}</div>
+   ${T?`<h3>어떤 ${state.topic==='사물'?'물건':state.topic}?</h3>
+   <div class="items">${T.items.map(([n,p])=>`<button class="chip" data-item="${n}" aria-pressed="${state.item===n&&!state.ownItem}">${n}<small>${p}쪽</small></button>`).join('')}</div>
+   <label class="field">내 마음대로 쓰기<input id="ownItem" maxlength="12" value="${esc(state.ownItem)}" placeholder="예: 구름, 펭귄 요리사"></label>
+   ${state.item||state.ownItem?`<div class="pick-note">${state.ownItem?'<b>'+esc(state.ownItem)+'</b>는 지호가 새로 생각한 주제야. 멋져!':'책 <b>'+(T.items.find(x=>x[0]===state.item)||[])[1]+'쪽</b>을 펴서 '+state.item+' 그리는 방법을 먼저 연습해 봐.'} 연습이 끝나면 책이랑 똑같지 않게, 지호만의 모습으로 바꿔야 진짜 팔 수 있어.${T.extra?' ('+T.extra+'도 보면 좋아)':''}</div>`:''}`:''}
+   ${navHTML()}</section>`;
+  m.querySelectorAll('[data-topic]').forEach(b=>b.onclick=()=>{if(state.topic!==b.dataset.topic){state.topic=b.dataset.topic;state.item='';state.slots.forEach(s=>s.guide=null)}save();render()});
+  m.querySelectorAll('[data-item]').forEach(b=>b.onclick=()=>{state.item=b.dataset.item;state.ownItem='';save();render()});
+  const oi=m.querySelector('#ownItem');if(oi)oi.onchange=()=>{state.ownItem=oi.value.trim();save();render()};
+}
+
+/* ---------- 2. 캐릭터 ---------- */
+function s2(m){const c=state.char;
+  say(c.name?[`<b>${esc(c.name)}</b>! 이름이 정말 귀엽다.`,'성격이랑 좋아하는 걸 정하면 24개 말을 만들기가 훨씬 쉬워져.']
+    :[`이제 ${esc(subject())} 캐릭터에게 이름을 지어 주자.`,'부르기 쉽고 짧은 이름이 좋아. 두세 글자면 딱이야!'],c.name?'wow':'think');
+  m.innerHTML=`<section class="card"><h2><span class="circ">2</span>내 캐릭터 만들기</h2>
+   <p class="lead">${esc(state.topic||'주제')} · ${esc(subject())}</p>
+   <div class="row"><label class="field" style="flex:1">캐릭터 이름<input id="cName" maxlength="8" value="${esc(c.name)}" placeholder="예: 쫀득이"></label>
+     <button class="btn ai" data-ai id="nameAI" hidden>쌤, 이름 추천해 줘</button></div>
+   <div class="items" id="nameSug"></div>
+   <h3>성격 <small style="font-family:var(--body);font-size:12px;color:var(--muted)">두 개까지</small></h3>
+   <div class="items">${TRAITS.map(t=>`<button class="chip" data-trait="${t}" aria-pressed="${c.traits.includes(t)}">${t}</button>`).join('')}</div>
+   <label class="field">좋아하는 것<input id="cLikes" maxlength="20" value="${esc(c.likes)}" placeholder="예: 딸기우유, 책 읽기"></label>
+   <h3>나만의 특징 하나</h3>
+   <div class="items">${MARKS.map(t=>`<button class="chip" data-mark="${t}" aria-pressed="${c.mark===t}">${t}</button>`).join('')}</div>
+   <label class="field">직접 쓰기<input id="cMark" maxlength="16" value="${esc(MARKS.includes(c.mark)?'':c.mark)}" placeholder="예: 꼬리에 리본"></label>
+   <div class="pick-note">특징은 24개 그림에 <b>모두 똑같이</b> 그려야 해. 그래야 한 친구로 보여!</div>
+   ${navHTML()}</section>`;
+  m.querySelector('#cName').oninput=e=>{c.name=e.target.value.trim();save();renderSteps()};
+  m.querySelector('#cName').onchange=()=>render();
+  m.querySelector('#cLikes').oninput=e=>{c.likes=e.target.value;save()};
+  m.querySelector('#cMark').oninput=e=>{c.mark=e.target.value;save();m.querySelectorAll('[data-mark]').forEach(b=>b.setAttribute('aria-pressed',false))};
+  m.querySelectorAll('[data-trait]').forEach(b=>b.onclick=()=>{const t=b.dataset.trait,i=c.traits.indexOf(t);if(i>=0)c.traits.splice(i,1);else{c.traits.push(t);if(c.traits.length>2)c.traits.shift()}save();render()});
+  m.querySelectorAll('[data-mark]').forEach(b=>b.onclick=()=>{c.mark=b.dataset.mark;save();render()});
+  const fallbackNames=()=>{const pool=['몽글','쫀득','콩콩','뽀송','말랑','동동','토실','방울','포근','꼬물'];return pool.sort(()=>Math.random()-.5).slice(0,5).map(n=>n+'이')};
+  const showNames=list=>{const box=m.querySelector('#nameSug');box.innerHTML='';list.forEach(n=>{const b=document.createElement('button');b.className='chip';b.textContent=n;b.onclick=()=>{c.name=n;save();render()};box.appendChild(b)})};
+  m.querySelector('#nameAI').onclick=async e=>{const b=e.currentTarget;b.disabled=true;b.textContent='생각하는 중...';
+    try{const r=await sample.json(RULES()+`\n\n${subject()} 캐릭터 이름 5개를 추천해. 2~4글자 한글, 귀엽고 부르기 쉬운 이름. 실제 유명 캐릭터 이름은 빼. JSON 배열(문자열)만 답해. 예: ["몽글이","쫀득이"]`,{modelTier:'quick',cache:false});
+      showNames((Array.isArray(r)?r:[]).map(String).slice(0,5))}catch(err){showNames(fallbackNames());say([aiErr(err)],'oops')}finally{b.disabled=false;b.textContent='쌤, 이름 추천해 줘'}};
+}
+
+/* ---------- 3. 24개 말 ---------- */
+function s3(m){
+  say([`${esc(state.char.name||'캐릭터')}가 할 말 24개를 정하자!`,'누구한테 보낼지 먼저 고르면 어떤 말이 필요한지 알 수 있어. 글자는 짧을수록 잘 보여. 6글자 안쪽이 좋아.'],'think');
+  m.innerHTML=`<section class="card"><h2><span class="circ">3</span>24개 말 정하기</h2>
+   <div class="row"><span class="lead">누구랑 쓸까?</span>${USERS.map(u=>`<button class="chip" data-user="${u}" aria-pressed="${state.user===u}">${u}</button>`).join('')}</div>
+   <div class="row"><button class="btn ai" data-ai id="phrAI" hidden>쌤, 24개 말 추천해 줘</button>${state.prevPhr?'<button class="btn" id="phrUndo">추천 전으로 되돌리기</button>':''}<span class="status" id="phrSt"></span></div>
+   <p class="lead">왼쪽은 감정 이름, 오른쪽은 그림에 쓸 글자예요.</p>
+   <div class="phr">${state.slots.map((s,i)=>`<div class="ph"><em>${i+1}</em><input class="l" data-i="${i}" data-k="label" value="${esc(s.label)}" maxlength="8" aria-label="${i+1}번 감정"><input class="c" data-i="${i}" data-k="caption" value="${esc(s.caption)}" maxlength="12" aria-label="${i+1}번 글자"></div>`).join('')}</div>
+   ${navHTML()}</section>`;
+  m.querySelectorAll('[data-user]').forEach(b=>b.onclick=()=>{state.user=b.dataset.user;save();render()});
+  m.querySelectorAll('.ph input').forEach(inp=>inp.oninput=()=>{state.slots[+inp.dataset.i][inp.dataset.k]=inp.value;save()});
+  m.querySelector('#phrUndo')?.addEventListener('click',()=>{state.prevPhr.forEach((p,i)=>{state.slots[i].label=p[0];state.slots[i].caption=p[1]});state.prevPhr=null;save();render()});
+  m.querySelector('#phrAI').onclick=async e=>{const b=e.currentTarget,st=m.querySelector('#phrSt');b.disabled=true;st.textContent='달달쌤이 24개를 고르는 중... (조금 걸려요)';
+    try{const r=await sample.json(RULES()+`\n\n${state.user} 주고받는 메시지에 쓸 이모티콘 문구 24개를 만들어. 인사, 기분 좋음, 속상함, 일상, 대답이 골고루 섞이게. 캐릭터 성격(${state.char.traits.join(',')})과 좋아하는 것(${state.char.likes})이 몇 개에 드러나게. 각 항목은 {"label": 감정 이름 2~4글자, "caption": 그림에 쓸 짧은 글 6글자 이내}. 정확히 24개 JSON 배열만 답해.`,{cache:false});
+      if(!Array.isArray(r)||r.length<12)throw{code:'invalid_json'};
+      state.prevPhr=state.slots.map(s=>[s.label,s.caption]);
+      r.slice(0,24).forEach((p,i)=>{state.slots[i].label=String(p.label||'').slice(0,8);state.slots[i].caption=String(p.caption||'').slice(0,12)});
+      save();render()}catch(err){st.textContent=aiErr(err);b.disabled=false}};
+}
+
+/* ---------- 4. 그리기 보드 ---------- */
+function s4(m){const done=state.slots.filter(s=>s.img).length;
+  say(done?[`벌써 <b>${done}개</b>나 그렸어! 대단해.`,done<24?'칸을 눌러서 계속 그려 보자. 연한 틀은 저장할 때 안 보이니까 걱정 마.':'24개를 다 그렸어! 이제 점검하러 가자.']
+    :['드디어 그리기 시간이야!','칸을 누르면 그림판이 열려. 연한 틀을 따라 그리고, 표정 도장도 써 봐. 빨간 점선 안쪽에 그려야 잘리지 않아.'],done>=24?'cheer':'happy');
+  m.innerHTML=`<section class="card"><h2><span class="circ">4</span>24개 그리기</h2>
+   <div class="row"><span>${done} / 24</span><div class="meter" style="flex:1"><i style="width:${done/24*100}%"></i></div></div>
+   <div class="board">${state.slots.map((s,i)=>`<button class="cell" data-cell="${i}">${state.main===i?'<span class="star">대표</span>':''}<span class="no">${String(i+1).padStart(2,'0')}</span><span class="thumb">${s.img?`<img alt="${esc(s.label)}" src="${s.img}">`:'<i>+</i>'}</span><span class="lab">${esc(s.label)}</span></button>`).join('')}</div>
+   ${navHTML()}</section>`;
+  m.querySelectorAll('[data-cell]').forEach(b=>b.onclick=()=>openEditor(+b.dataset.cell));
+}
+
+/* ---------- 밑그림 틀 ---------- */
+const DIRS=[['front','정면'],['left','왼쪽'],['right','오른쪽'],['up','위'],['down','아래']];
+const GUIDES={
+ 사람:[['stand','서기'],['wave','손 흔들기'],['hooray','만세'],['thumb','엄지척'],['point','가리키기'],['bow','꾸벅'],['fist','파이팅'],['heart','손 하트'],['grab','머리 감싸기'],['sit','앉기'],['lie','엎드리기'],['none','틀 없음']],
+ 동물:[['blob','동글 몸'],['snow','머리+몸'],['side','옆모습'],['mochi','찹쌀떡'],['tall','서 있기'],['wave','손 흔들기'],['hooray','만세'],['lie','엎드리기'],['none','틀 없음']],
+ 사물:[['circle','동그라미'],['tri','세모'],['square','네모'],['drop','물방울'],['cloud','구름'],['tall','길쭉이'],['oval','타원'],['none','틀 없음']]
+};
+const defGuide=()=>({사람:'stand',동물:'blob',사물:'circle'})[state.topic]||'stand';
+function cross(c,x,y,rx,ry,dir){const dx={left:-.45,right:.45}[dir]||0,dy={up:-.4,down:.45}[dir]||0;
+  c.save();c.setLineDash([]);c.strokeStyle='#E8A3A2';
+  c.beginPath();c.moveTo(x+dx*rx*.3,y-ry);c.quadraticCurveTo(x+dx*rx*1.3,y,x+dx*rx*.3,y+ry);c.stroke();
+  c.beginPath();c.moveTo(x-rx,y+dy*ry*.3);c.quadraticCurveTo(x,y+dy*ry*1.3,x+rx,y+dy*ry*.3);c.stroke();c.restore()}
+function ell(c,x,y,rx,ry){c.beginPath();c.ellipse(x,y,rx,ry,0,0,Math.PI*2);c.stroke()}
+function line(c,p){c.beginPath();c.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)c.lineTo(p[i],p[i+1]);c.stroke()}
+function hand(c,x,y,r){c.beginPath();c.arc(x,y,r||9,0,Math.PI*2);c.stroke()}
+function legs(c,y){line(c,[165,y,163,y+18]);line(c,[205,y,207,y+18])}
+function head(c,x,y,rx,ry,dir){ell(c,x,y,rx,ry);cross(c,x,y,rx,ry,dir)}
+function personPose(c,pose,dir){ // 360 좌표 → 370x320 틀 (translate)
+  c.translate(5,-28);const H=()=>head(c,180,140,80,70,dir);
+  const body=a=>{line(c,[158,206,154,262,206,262,202,206]);line(c,[166,262,166,280]);line(c,[194,262,194,280]);a&&a()};
+  switch(pose){
+   case 'stand':H();body(()=>{line(c,[158,214,140,244]);line(c,[202,214,220,244]);hand(c,138,250);hand(c,222,250)});break;
+   case 'wave':H();body(()=>{line(c,[158,214,140,244]);hand(c,138,250);line(c,[202,212,236,184]);hand(c,244,174,11)});break;
+   case 'hooray':H();body(()=>{line(c,[158,212,112,160]);line(c,[202,212,248,160]);hand(c,106,152);hand(c,254,152)});break;
+   case 'thumb':H();body(()=>{line(c,[158,214,140,244]);hand(c,138,250);line(c,[202,214,238,222]);hand(c,248,222,12);line(c,[248,210,248,194])});break;
+   case 'point':H();body(()=>{line(c,[158,214,118,250]);line(c,[202,214,242,250]);hand(c,112,258);hand(c,248,258)});break;
+   case 'bow':c.save();c.translate(180,190);c.rotate(.22);c.translate(-180,-190);H();c.restore();line(c,[150,222,150,270,202,270,206,226]);line(c,[160,270,160,288]);line(c,[194,270,194,288]);line(c,[154,232,178,252]);hand(c,184,256);break;
+   case 'fist':H();body(()=>{line(c,[158,212,140,190]);hand(c,136,180,12);line(c,[202,212,220,190]);hand(c,224,180,12)});break;
+   case 'heart':H();body(()=>{line(c,[158,212,176,196]);line(c,[202,212,184,196]);c.beginPath();c.moveTo(180,206);c.bezierCurveTo(150,184,162,166,180,180);c.bezierCurveTo(198,166,210,184,180,206);c.stroke()});break;
+   case 'grab':head(c,180,150,80,70,dir);body(()=>{line(c,[158,214,96,150]);line(c,[202,214,264,150]);hand(c,98,138,12);hand(c,262,138,12)});break;
+   case 'sit':head(c,180,150,80,70,dir);line(c,[156,214,152,268,208,268,204,214]);line(c,[158,268,140,284]);line(c,[204,268,222,284]);line(c,[158,226,146,256]);line(c,[202,226,214,256]);break;
+   case 'lie':head(c,140,228,74,52,dir);line(c,[200,248,286,250,286,270,190,274]);line(c,[286,256,306,248]);line(c,[286,266,308,268]);c.beginPath();c.moveTo(40,282);c.lineTo(330,282);c.stroke();break;
+  }}
+function animalPose(c,g,dir){const ears=(a,b,r)=>{hand(c,a[0],a[1],r||16);hand(c,b[0],b[1],r||16)};
+  switch(g){
+   case 'blob':ell(c,185,160,100,100);ears([118,72],[252,72]);cross(c,185,140,70,55,dir);line(c,[150,258,148,272]);line(c,[220,258,222,272]);break;
+   case 'snow':head(c,185,108,74,64,dir);ears([128,52],[242,52],14);ell(c,185,218,62,52);line(c,[128,206,108,228]);line(c,[242,206,262,228]);legs(c,262);break;
+   case 'side':ell(c,152,170,72,70);ell(c,238,190,74,62);ears([108,112],[176,104],14);cross(c,140,170,60,58,dir);line(c,[205,248,205,268]);line(c,[268,246,270,266]);line(c,[308,180,330,160]);break;
+   case 'mochi':c.beginPath();c.moveTo(70,262);c.bezierCurveTo(70,90,300,90,300,262);c.closePath();c.stroke();ears([120,120],[250,120],13);cross(c,185,200,90,48,dir);break;
+   case 'tall':ell(c,185,160,76,112);ears([138,52],[232,52],14);cross(c,185,120,60,48,dir);line(c,[140,190,124,206]);line(c,[230,190,246,206]);legs(c,268);break;
+   case 'wave':ell(c,185,160,90,96);ears([124,76],[246,76]);cross(c,185,140,64,52,dir);line(c,[110,190,92,214]);line(c,[262,170,290,130]);hand(c,296,120,12);legs(c,252);break;
+   case 'hooray':ell(c,185,170,90,90);ears([124,92],[246,92]);cross(c,185,150,64,52,dir);line(c,[112,160,76,110]);line(c,[258,160,294,110]);hand(c,72,100);hand(c,298,100);legs(c,256);break;
+   case 'lie':ell(c,185,230,140,52);ears([96,180],[150,172],13);cross(c,130,226,70,40,dir);c.beginPath();c.moveTo(30,284);c.lineTo(340,284);c.stroke();break;
+  }}
+function thingPose(c,g,dir){const arms=(y)=>{line(c,[80,y,58,y+24]);line(c,[290,y,312,y+24])},lg=y=>{line(c,[160,y,158,y+22]);line(c,[210,y,212,y+22])};
+  switch(g){
+   case 'circle':ell(c,185,150,105,105);cross(c,185,150,70,60,dir);arms(160);lg(254);break;
+   case 'tri':c.beginPath();c.moveTo(185,40);c.lineTo(75,262);c.lineTo(295,262);c.closePath();c.stroke();cross(c,185,190,60,44,dir);line(c,[110,200,82,226]);line(c,[260,200,288,226]);break;
+   case 'square':c.beginPath();c.roundRect(85,52,200,200,26);c.stroke();cross(c,185,150,80,70,dir);arms(160);lg(252);break;
+   case 'drop':c.beginPath();c.moveTo(185,36);c.bezierCurveTo(250,120,290,170,290,198);c.bezierCurveTo(290,262,80,262,80,198);c.bezierCurveTo(80,170,120,120,185,36);c.closePath();c.stroke();cross(c,185,196,70,44,dir);lg(256);break;
+   case 'cloud':c.beginPath();c.moveTo(90,230);c.bezierCurveTo(40,230,40,160,95,160);c.bezierCurveTo(95,95,175,80,195,125);c.bezierCurveTo(230,85,300,110,285,165);c.bezierCurveTo(335,170,330,232,280,232);c.closePath();c.stroke();cross(c,185,185,70,40,dir);lg(232);break;
+   case 'tall':c.beginPath();c.roundRect(135,30,100,232,40);c.stroke();cross(c,185,110,46,50,dir);line(c,[135,160,110,184]);line(c,[235,160,260,184]);lg(262);break;
+   case 'oval':ell(c,185,160,140,82);cross(c,185,160,90,60,dir);lg(240);break;
+  }}
+function drawGuide(c,g,dir,col){c.save();c.scale(G,G);c.lineWidth=2.4;c.lineCap='round';c.lineJoin='round';c.strokeStyle=col||'#9FB0CC';c.setLineDash([7,6]);
+  if(g!=='none'){if(state.topic==='동물')animalPose(c,g,dir);else if(state.topic==='사물')thingPose(c,g,dir);else personPose(c,g,dir)}c.restore()}
+
+/* ---------- 표정 도장 ---------- */
+const INK='#23262F';
+const dot=(c,x,y,r)=>{c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill()};
+const arc=(c,x,y,r,a,b)=>{c.beginPath();c.arc(x,y,r,a,b);c.stroke()};
+const STAMPS=[
+ ['eyes','점 눈',c=>{dot(c,-24,0,6);dot(c,24,0,6)}],
+ ['eyes2','반짝 눈',c=>{dot(c,-24,0,9);dot(c,24,0,9);c.fillStyle='#fff';dot(c,-21,-3,3);dot(c,27,-3,3)}],
+ ['happy','웃는 눈',c=>{arc(c,-24,4,9,Math.PI*1.1,Math.PI*1.9);arc(c,24,4,9,Math.PI*1.1,Math.PI*1.9)}],
+ ['closed','감은 눈',c=>{arc(c,-24,-4,9,Math.PI*.1,Math.PI*.9);arc(c,24,-4,9,Math.PI*.1,Math.PI*.9)}],
+ ['xx','>< 눈',c=>{c.beginPath();c.moveTo(-32,-8);c.lineTo(-18,0);c.lineTo(-32,8);c.moveTo(32,-8);c.lineTo(18,0);c.lineTo(32,8);c.stroke()}],
+ ['heye','하트 눈',c=>{c.fillStyle='#E04848';[-26,26].forEach(x=>{c.beginPath();c.moveTo(x,10);c.bezierCurveTo(x-16,-2,x-8,-14,x,-4);c.bezierCurveTo(x+8,-14,x+16,-2,x,10);c.fill()})}],
+ ['angry','화난 눈',c=>{c.beginPath();c.moveTo(-36,-14);c.lineTo(-14,-4);c.moveTo(36,-14);c.lineTo(14,-4);c.stroke();dot(c,-22,6,5);dot(c,22,6,5)}],
+ ['sad','시무룩 눈',c=>{c.beginPath();c.moveTo(-34,-4);c.lineTo(-14,-12);c.moveTo(34,-4);c.lineTo(14,-12);c.stroke();dot(c,-22,6,5);dot(c,22,6,5)}],
+ ['smile','웃는 입',c=>arc(c,0,-6,12,Math.PI*.15,Math.PI*.85)],
+ ['big','활짝 입',c=>{c.fillStyle='#F28F8F';c.beginPath();c.moveTo(-14,-4);c.quadraticCurveTo(0,26,14,-4);c.closePath();c.fill();c.stroke()}],
+ ['oh','놀란 입',c=>{c.beginPath();c.ellipse(0,0,7,10,0,0,Math.PI*2);c.stroke()}],
+ ['frown','삐진 입',c=>arc(c,0,12,12,Math.PI*1.2,Math.PI*1.8)],
+ ['tongue','메롱',c=>{arc(c,0,-6,12,Math.PI*.15,Math.PI*.85);c.fillStyle='#F28F8F';c.beginPath();c.ellipse(4,8,5,7,0,0,Math.PI*2);c.fill();c.stroke()}],
+ ['cat','ω 입',c=>{arc(c,-6,-2,6,0,Math.PI);arc(c,6,-2,6,0,Math.PI)}],
+ ['blush','볼터치',c=>{c.fillStyle='rgba(242,130,140,.55)';c.beginPath();c.ellipse(-44,0,13,8,0,0,Math.PI*2);c.fill();c.beginPath();c.ellipse(44,0,13,8,0,0,Math.PI*2);c.fill()}],
+ ['tear','눈물',c=>{c.fillStyle='#8EC7EA';[-24,24].forEach(x=>{c.beginPath();c.moveTo(x,-10);c.quadraticCurveTo(x-10,10,x,14);c.quadraticCurveTo(x+10,10,x,-10);c.fill();c.stroke()})}],
+ ['sweat','땀방울',c=>{c.fillStyle='#8EC7EA';c.beginPath();c.moveTo(0,-16);c.quadraticCurveTo(-12,8,0,12);c.quadraticCurveTo(12,8,0,-16);c.fill();c.stroke()}],
+ ['spark','반짝이',c=>{c.fillStyle='#F5C542';const s=(x,y,r)=>{c.beginPath();c.moveTo(x,y-r);c.quadraticCurveTo(x,y,x+r,y);c.quadraticCurveTo(x,y,x,y+r);c.quadraticCurveTo(x,y,x-r,y);c.quadraticCurveTo(x,y,x,y-r);c.fill();c.stroke()};s(-10,-6,14);s(14,12,8)}],
+ ['heart','하트',c=>{c.fillStyle='#F06C7A';c.beginPath();c.moveTo(0,14);c.bezierCurveTo(-24,-2,-12,-20,0,-6);c.bezierCurveTo(12,-20,24,-2,0,14);c.fill();c.stroke()}],
+ ['zzz','쿨쿨',c=>{c.font='bold 22px Gaegu, sans-serif';c.fillText('Z',-16,8);c.font='bold 16px Gaegu, sans-serif';c.fillText('z',4,-4);c.font='bold 12px Gaegu, sans-serif';c.fillText('z',16,-14)}],
+ ['q','물음표',c=>{c.font='bold 34px Gaegu, sans-serif';c.textAlign='center';c.fillText('?',0,12)}],
+ ['ex','느낌표',c=>{c.font='bold 34px Gaegu, sans-serif';c.textAlign='center';c.fillText('!',-6,12);c.fillText('!',8,12)}],
+ ['angerm','빠직',c=>{c.strokeStyle='#E04848';c.lineWidth=3.5;[[0,-1],[1,0],[0,1],[-1,0]].forEach(([a,b])=>{c.beginPath();c.moveTo(a*5+b*5,b*5-a*5);c.quadraticCurveTo(a*14,b*14,a*5-b*5,b*5+a*5);c.stroke()})}],
+ ['note','음표',c=>{c.beginPath();c.ellipse(-6,10,7,5,-.4,0,Math.PI*2);c.fill();line(c,[1,8,1,-16,14,-10])}]
+];
+function stampDraw(c,id,x,y,sc){const s=STAMPS.find(s=>s[0]===id);if(!s)return;c.save();c.translate(x,y);c.scale(sc,sc);
+  c.strokeStyle=INK;c.fillStyle=INK;c.lineWidth=3.2;c.lineCap='round';c.lineJoin='round';s[2](c);c.restore()}
+
+/* ---------- 그림판 ---------- */
+const gc=$('#guide').getContext('2d'),dc=$('#draw').getContext('2d',{willReadFrequently:true});
+let cur=-1,tool='pen',color=INK,size=7,showGuide=true,pending=null,hist=[],redo=[];
+const COLORS=['#23262F','#7A8091','#E04848','#F28F8F','#F5A65B','#F5D36B','#9BD08A','#7DBFB6','#8EC7EA','#A99BE0','#8B5E3C','#FFFFFF'];
+COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.style.background=c;b.setAttribute('aria-label','색');b.setAttribute('aria-pressed',c===color);
+  b.onclick=()=>{color=c;document.querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed',x===b));if(tool==='eraser')setTool('pen')};$('#swatches').appendChild(b)});
+$('#size').oninput=e=>size=+e.target.value;
+STAMPS.forEach(([id,name])=>{const b=document.createElement('button');b.className='pk';b.dataset.stamp=id;const cv=document.createElement('canvas');cv.width=cv.height=96;
+  stampDraw(cv.getContext('2d'),id,48,40,.95);b.appendChild(cv);b.insertAdjacentHTML('beforeend',`<span>${name}</span>`);
+  b.onclick=()=>{pending=pending===id?null:id;syncPicks();hint(pending?`그림판에서 '${name}'을(를) 찍을 곳을 콕!`:'',!!pending)};$('#stamps').appendChild(b)});
+DIRS.forEach(([id,n])=>{const b=document.createElement('button');b.className='chip';b.dataset.dir=id;b.textContent='얼굴 '+n;b.onclick=()=>{state.slots[cur].dir=id;save();syncPicks();paintGuide()};$('#dirs').appendChild(b)});
+function buildPoses(){const box=$('#poses');box.innerHTML='';(GUIDES[state.topic]||GUIDES.사람).forEach(([id,name])=>{const b=document.createElement('button');b.className='pk';b.dataset.pose=id;
+  if(id!=='none'){const cv=document.createElement('canvas');cv.width=cv.height=120;const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,120,120);c.translate(0,10);c.scale(120/W,120/W);drawGuide(c,id,'front','#55607A');b.appendChild(cv)}
+  b.insertAdjacentHTML('beforeend',`<span>${name}</span>`);b.onclick=()=>{state.slots[cur].guide=id;save();syncPicks();paintGuide()};box.appendChild(b)});
+  $('#guideKind').textContent={사람:'사람 자세',동물:'동물 몸 모양',사물:'물건 모양'}[state.topic]||'따라 그릴 모양'}
+function syncPicks(){const s=state.slots[cur];if(!s)return;
+  document.querySelectorAll('[data-pose]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pose===(s.guide||defGuide())));
+  document.querySelectorAll('[data-dir]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.dir===s.dir));
+  document.querySelectorAll('[data-stamp]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.stamp===pending))}
+function hint(t,on){$('#hint').textContent=t||'연한 틀을 따라 그려요. 틀은 저장할 때 사라져요.';$('#hint').classList.toggle('on',!!on)}
+function paintGuide(){gc.clearRect(0,0,W,H);const s=state.slots[cur];if(showGuide&&s)drawGuide(gc,s.guide||defGuide(),s.dir)}
+function setTool(t){tool=t;pending=null;syncPicks();hint(t==='fill'?'색칠할 곳을 콕! 선이 이어져 있어야 해요':'',t==='fill');document.querySelectorAll('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t))}
+document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+$('#guideBtn').onclick=e=>{showGuide=!showGuide;e.currentTarget.setAttribute('aria-pressed',showGuide);paintGuide()};
+function snap(){hist.push(dc.getImageData(0,0,W,H));if(hist.length>25)hist.shift();redo=[]}
+$('#undoBtn').onclick=()=>{if(!hist.length)return;redo.push(dc.getImageData(0,0,W,H));dc.putImageData(hist.pop(),0,0);persist()};
+$('#redoBtn').onclick=()=>{if(!redo.length)return;hist.push(dc.getImageData(0,0,W,H));dc.putImageData(redo.pop(),0,0);persist()};
+$('#clearBtn').onclick=()=>ask('이 칸을 모두 지울까요?','지운 뒤에도 되돌리기 버튼으로 살릴 수 있어요.',()=>{snap();dc.clearRect(0,0,W,H);persist()});
+let saveT;
+const blank=()=>{const d=dc.getImageData(0,0,W,H).data;for(let i=3;i<d.length;i+=24)if(d[i])return false;return true};
+function commit(){const s=state.slots[cur];if(s){s.img=blank()?null:$('#draw').toDataURL('image/png');save()}}
+function persist(){clearTimeout(saveT);saveT=setTimeout(commit,300)}
+const cvEl=$('#draw');let drawing=false,last=null;
+const pos=e=>{const r=cvEl.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}};
+cvEl.addEventListener('pointerdown',e=>{const p=pos(e);
+  if(pending){snap();stampDraw(dc,pending,p.x,p.y,G*1.25*(size>14?1.4:size<4?.8:1));persist();return}
+  if(tool==='fill'){snap();flood(Math.round(p.x),Math.round(p.y),color);persist();return}
+  snap();drawing=true;last=p;cvEl.setPointerCapture(e.pointerId);dc.globalCompositeOperation=tool==='eraser'?'destination-out':'source-over';
+  dc.fillStyle=color;dc.beginPath();dc.arc(p.x,p.y,size*G/2*(tool==='eraser'?2:1),0,Math.PI*2);dc.fill()});
+cvEl.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);dc.strokeStyle=color;dc.lineWidth=size*G*(tool==='eraser'?2:1);dc.lineCap='round';dc.lineJoin='round';
+  dc.beginPath();dc.moveTo(last.x,last.y);dc.quadraticCurveTo(last.x,last.y,(last.x+p.x)/2,(last.y+p.y)/2);dc.lineTo(p.x,p.y);dc.stroke();last=p});
+const end=()=>{if(!drawing)return;drawing=false;dc.globalCompositeOperation='source-over';persist()};
+cvEl.addEventListener('pointerup',end);cvEl.addEventListener('pointercancel',end);
+function flood(x,y,col){const img=dc.getImageData(0,0,W,H),d=img.data,n=parseInt(col.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;
+  if(x<0||y<0||x>=W||y>=H)return;const i0=(y*W+x)*4,tr=d[i0],tg=d[i0+1],tb=d[i0+2],ta=d[i0+3];
+  if(ta>200&&Math.abs(tr-r)+Math.abs(tg-g)+Math.abs(tb-b)<10)return;
+  const match=i=>ta<40?d[i+3]<110:Math.abs(d[i]-tr)+Math.abs(d[i+1]-tg)+Math.abs(d[i+2]-tb)+Math.abs(d[i+3]-ta)<90;
+  const seen=new Uint8Array(W*H),stack=[x,y],filled=[];
+  while(stack.length){const cy=stack.pop();let cx=stack.pop(),i=cy*W+cx;
+    while(cx>=0&&!seen[i]&&match(i*4)){cx--;i--}cx++;i++;let up=false,dn=false;
+    while(cx<W&&!seen[i]&&match(i*4)){seen[i]=1;filled.push(i);
+      if(cy>0){const u=i-W;if(!seen[u]&&match(u*4)){if(!up){stack.push(cx,cy-1);up=true}}else up=false}
+      if(cy<H-1){const v=i+W;if(!seen[v]&&match(v*4)){if(!dn){stack.push(cx,cy+1);dn=true}}else dn=false}
+      cx++;i++}}
+  if(filled.length>W*H*.85){hint('선이 끊긴 곳이 있어서 바깥까지 칠해질 뻔했어요. 선을 이어 주세요!',true);hist.pop();return}
+  const mask=new Uint8Array(W*H);filled.forEach(i=>{mask[i]=1;const xx=i%W;if(xx>0)mask[i-1]=1;if(xx<W-1)mask[i+1]=1;if(i>=W)mask[i-W]=1;if(i<W*H-W)mask[i+W]=1});
+  for(let i=0;i<mask.length;i++)if(mask[i]&&(seen[i]||d[i*4+3]<250)){const k=i*4;
+    if(!seen[i]){const a=d[k+3]/255;d[k]=d[k]*a+r*(1-a);d[k+1]=d[k+1]*a+g*(1-a);d[k+2]=d[k+2]*a+b*(1-a);d[k+3]=255}else{d[k]=r;d[k+1]=g;d[k+2]=b;d[k+3]=255}}
+  dc.putImageData(img,0,0)}
+function openEditor(i){cur=i;const s=state.slots[i];hist=[];redo=[];pending=null;buildPoses();
+  $('#edNo').textContent=(i+1)+'번';$('#edWhat').textContent=s.label;$('#edCap').value=s.caption;$('#capPrev').textContent=s.caption;$('#tipOut').hidden=true;
+  dc.clearRect(0,0,W,H);if(s.img){const im=new Image();im.onload=()=>dc.drawImage(im,0,0,W,H);im.src=s.img}
+  paintGuide();syncPicks();setTool(tool==='fill'?'pen':tool);$('#editor').hidden=false;$('#editor').scrollTop=0;document.body.style.overflow='hidden';lightAI()}
+function closeEditor(){clearTimeout(saveT);commit();$('#editor').hidden=true;document.body.style.overflow='';render()}
+$('#backBtn').onclick=closeEditor;
+$('#prevBtn').onclick=()=>{const n=(cur+23)%24;clearTimeout(saveT);commit();openEditor(n)};
+$('#nextBtn').onclick=()=>{const n=(cur+1)%24;clearTimeout(saveT);commit();openEditor(n)};
+$('#edCap').oninput=e=>{state.slots[cur].caption=e.target.value;$('#capPrev').textContent=e.target.value;save()};
+$('#tipBtn').onclick=async e=>{const b=e.currentTarget,out=$('#tipOut'),s=state.slots[cur];b.disabled=true;out.hidden=false;out.textContent='달달쌤이 생각하는 중...';
+  try{await sample(RULES()+`\n\n"${s.label}"(글자: "${s.caption}") 칸을 그리려고 해. ${subject()} 캐릭터로 이 감정을 표현하는 방법을 알려줘. 눈, 입, 손이나 몸 모양, 작은 효과(땀, 반짝이, 하트 등) 중에서 2~3가지만, 아주 쉽게.`,{modelTier:'quick',onText:({text})=>out.textContent=text})}
+  catch(err){out.textContent=err.text||aiErr(err)}finally{b.disabled=false}};
+
+/* ---------- 이미지 만들기 (OGQ 규격) ---------- */
+const loadImg=src=>new Promise(r=>{const im=new Image();im.onload=()=>r(im);im.onerror=()=>r(null);im.src=src});
+async function stickerCanvas(i){const s=state.slots[i],cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  if(s.img){const im=await loadImg(s.img);if(im)c.drawImage(im,0,0,W,H)}
+  if(s.caption){c.font='bold 64px Gaegu, "Gowun Dodum", sans-serif';c.textAlign='center';c.lineJoin='round';c.lineWidth=14;c.strokeStyle='#fff';c.strokeText(s.caption,W/2,H-34);c.fillStyle='#23262F';c.fillText(s.caption,W/2,H-34)}
+  return cv}
+function fitInto(src,w,h,pad){const cv=document.createElement('canvas');cv.width=w;cv.height=h;const c=cv.getContext('2d');
+  const sc=Math.min((w-pad*2)/src.width,(h-pad*2)/src.height);c.drawImage(src,(w-src.width*sc)/2,(h-src.height*sc)/2,src.width*sc,src.height*sc);return cv}
+async function mainFrom(i){const s=state.slots[i],cv=document.createElement('canvas');cv.width=W;cv.height=H;if(s.img){const im=await loadImg(s.img);if(im)cv.getContext('2d').drawImage(im,0,0)}return cv}
+async function sheetCanvas(){const cols=4,cell=230,pad=16,top=96,lab=40,rows=6;const Wd=cols*cell+(cols+1)*pad,Hd=top+rows*(cell*640/740+lab)+(rows+1)*pad;
+  const cv=document.createElement('canvas');cv.width=Wd;cv.height=Math.ceil(Hd);const c=cv.getContext('2d');c.fillStyle='#F4F6FB';c.fillRect(0,0,cv.width,cv.height);
+  c.fillStyle='#23262F';c.font='bold 46px Gaegu, sans-serif';c.fillText(state.title||(state.char.name||'나의')+' 이모티콘',pad,58);
+  c.font='20px "Gowun Dodum", sans-serif';c.fillStyle='#6B7385';c.fillText(`${subject()} · 그림 지호`,pad,86);
+  const ch=cell*640/740;
+  for(let i=0;i<24;i++){const x=pad+(i%cols)*(cell+pad),y=top+pad+Math.floor(i/cols)*(ch+lab+pad);
+    c.fillStyle='#fff';c.strokeStyle='#23262F';c.lineWidth=2;c.beginPath();c.roundRect(x,y,cell,ch+lab,12);c.fill();c.stroke();
+    const st=await stickerCanvas(i);c.drawImage(st,x,y,cell,ch);c.fillStyle='#23262F';c.font='bold 22px Gaegu, sans-serif';c.textAlign='center';c.fillText(`${i+1}. ${state.slots[i].label}`,x+cell/2,y+ch+28);c.textAlign='left'}
+  return cv}
+
+/* ---------- 5. 점검 ---------- */
+const MANUAL=[['same','24개 모두 같은 친구로 보여요 (특징이 다 있어요)'],['line','선이 또렷하고, 빨간 점선 밖으로 안 나갔어요'],['text','글자가 크고 잘 읽혀요'],['own','다른 캐릭터나 책 그림을 그대로 베끼지 않았어요'],['nice','나쁜 말이나 무서운 그림이 없어요'],['mom','엄마랑 같이 한 번 봤어요']];
+function checksDone(){return state.slots.every(s=>s.img)&&MANUAL.every(([k])=>state.checks[k])}
+function s5(m){const drawn=state.slots.filter(s=>s.img).length,capd=state.slots.filter(s=>s.caption.trim()).length,longCap=state.slots.filter(s=>s.caption.length>7).map((s,i)=>i+1);
+  say(drawn<24?[`아직 그림이 ${24-drawn}칸 남았어. 4단계에서 마저 그리고 오자!`,'점검표는 미리 봐 둬도 좋아.']:['24개 완성! 이제 진짜 작가처럼 점검해 보자.','하나씩 확인하고 체크해 봐. 다 체크하면 제출 준비 끝이야.'],drawn<24?'oops':'cheer');
+  m.innerHTML=`<section class="card"><h2><span class="circ">5</span>작가 점검표</h2>
+   <div class="checks">
+    <div class="ck auto"><b class="${drawn===24?'ok':'no'}">${drawn===24?'✓':'·'}</b><span>그림 24개 중 <b>${drawn}개</b> 완성</span></div>
+    <div class="ck auto"><b class="ok">✓</b><span>글자 있는 칸 ${capd}개${longCap.length?` · 글자가 긴 칸: ${longCap.join(', ')}번 (짧게 줄이면 더 잘 보여요)`:''}</span></div>
+    ${MANUAL.map(([k,t])=>`<label class="ck"><input type="checkbox" data-ck="${k}" ${state.checks[k]?'checked':''}><span>${t}</span></label>`).join('')}
+   </div>
+   <h3>한 장으로 모아보기</h3>
+   <div class="row"><button class="btn" id="mkSheet">모아보기 만들기</button><button class="btn" id="saveSheet" hidden>모아보기 그림 저장</button>
+     <button class="btn ai" data-ai id="reviewAI" hidden>달달쌤한테 검사받기</button></div>
+   <span class="status" id="shSt"></span>
+   <img class="sheetimg" id="sheetImg" alt="24개 이모티콘 모음" hidden>
+   <div class="answer" id="review" hidden></div>
+   ${navHTML()}</section>`;
+  m.querySelectorAll('[data-ck]').forEach(b=>b.onchange=()=>{state.checks[b.dataset.ck]=b.checked;save();renderSteps()});
+  let sheet=null;const mk=async()=>{sheet=await sheetCanvas();const img=m.querySelector('#sheetImg');img.src=sheet.toDataURL('image/png');img.hidden=false;
+    m.querySelector('#saveSheet').hidden=!canSave();m.querySelector('#shSt').textContent=canSave()?'':'사진을 길게 눌러 저장할 수 있어요.';return sheet};
+  m.querySelector('#mkSheet').onclick=mk;
+  m.querySelector('#saveSheet').onclick=async()=>{if(!sheet)await mk();const st=m.querySelector('#shSt');try{const blob=await new Promise(r=>sheet.toBlob(r,'image/png'));
+    await saveFile(`${state.char.name||'이모티콘'}_모아보기.png`,blob);st.textContent='저장했어요. 엄마 휴대폰으로 보내 보세요.'}catch(e){st.textContent=e?.code==='declined'?'저장을 취소했어요.':'여기서는 저장이 안 돼요. 사진을 길게 눌러 저장해 주세요.'}};
+  m.querySelector('#reviewAI').onclick=async e=>{const b=e.currentTarget,out=m.querySelector('#review');b.disabled=true;out.hidden=false;out.textContent='달달쌤이 꼼꼼히 보는 중... (30초쯤 걸려요)';
+    try{const opts={onText:({text})=>out.textContent=text};let prompt=RULES()+`\n\n지호가 만든 이모티콘 24개 목록: ${state.slots.map((s,i)=>`${i+1}.${s.label}(${s.caption})${s.img?'':'[아직 안 그림]'}`).join(', ')}.\n`;
+      if(images){const sh=sheet||await mk();opts.images=await new Promise(r=>sh.toBlob(r,'image/png'));prompt+='첨부한 사진은 24개를 한 장에 모은 그림이야. 잘한 점 2개를 먼저 말하고, 네이버 OGQ 심사에 통과하려면 고칠 점을 번호와 함께 2~3개만 쉽게 알려줘. 같은 캐릭터로 보이는지, 선과 글자가 잘 보이는지, 비슷한 그림이 겹치지 않는지 봐 줘.'}
+      else prompt+='그림은 볼 수 없으니 목록만 보고, 감정이 골고루 있는지와 겹치는 게 없는지 쉽게 알려줘. 잘한 점 1개, 고칠 점 2개.';
+      await sample(prompt,opts)}catch(err){out.textContent=err.text||aiErr(err)}finally{b.disabled=false}};
+}
+
+/* ---------- 6. 제출 ---------- */
+function s6(m){
+  say(['진짜 마지막 단계야! 여기부터는 <b>엄마랑 같이</b> 하는 거야.','대표 그림을 고르고, 이모티콘 이름이랑 소개 글을 쓰면 네이버에 낼 파일이 한 번에 만들어져.'],'cheer');
+  m.innerHTML=`<section class="card"><h2><span class="circ">6</span>네이버에 내기</h2>
+   <h3>대표 그림 고르기</h3>
+   <div class="mainpick"><label class="field">몇 번 그림?<select id="mainSel">${state.slots.map((s,i)=>`<option value="${i}" ${state.main===i?'selected':''}>${i+1}. ${esc(s.label)}${s.img?'':' (안 그림)'}</option>`).join('')}</select></label>
+     <canvas id="mainPrev" width="240" height="240" aria-label="메인 이미지 240x240"></canvas><canvas id="tabPrev" class="tab" width="96" height="74" aria-label="탭 이미지 96x74"></canvas></div>
+   <h3>이름과 소개</h3>
+   <div class="row"><button class="btn ai" data-ai id="metaAI" hidden>쌤, 이름·소개·태그 써 줘</button><span class="status" id="metaSt"></span></div>
+   <label class="field">이모티콘 이름<input id="mTitle" maxlength="30" value="${esc(state.title)}" placeholder="예: 쫀득이의 하루"></label>
+   <label class="field">소개 글<textarea id="mDesc" maxlength="200" placeholder="예: 말랑말랑 쫀득이가 친구에게 마음을 전해요.">${esc(state.desc)}</textarea></label>
+   <label class="field">태그 (쉼표로 나누기, 명사로)<input id="mTags" maxlength="80" value="${esc(state.tags)}" placeholder="예: 햄스터, 인사, 귀여운"></label>
+   <h3>파일 한 번에 만들기</h3>
+   <div class="tablewrap"><table class="spec"><tr><th>파일</th><th>개수</th><th>크기</th></tr>
+     <tr><td>메인 이미지</td><td>1장</td><td>240×240 PNG</td></tr><tr><td>스티커 이미지</td><td>24장</td><td>740×640 PNG</td></tr><tr><td>탭 이미지</td><td>1장</td><td>96×74 PNG</td></tr></table></div>
+   <div class="row"><button class="btn primary" id="zipBtn">OGQ 제출 파일 저장 (ZIP)</button><span class="status" id="zipSt"></span></div>
+   <div class="mom"><h3>엄마가 할 일</h3><ol>
+     <li><a href="https://creators.ogq.me" target="_blank" rel="noopener">OGQ 크리에이터 스튜디오</a>에 <b>엄마 이름으로</b> 가입해요. 약관상 만 14세 미만은 가입이 거절될 수 있고 법정대리인 인증이 필요해서, 판매와 정산은 엄마 계정이 안전해요.</li>
+     <li>콘텐츠 등록에서 <b>스티커</b>를 고르고, ZIP 안의 메인·스티커 24장·탭 이미지를 올려요. (각 1MB 이하, RGB)</li>
+     <li>위의 이름, 소개 글, 태그를 붙여 넣고 작가 소개에 "그림: 지호(8살)"처럼 적어 두면 좋아요.</li>
+     <li>제출하면 심사를 기다려요. 반려되면 이유를 보고 4단계에서 고친 뒤 다시 내면 돼요.</li>
+     <li>통과하면 네이버 OGQ마켓에서 판매돼요. 판매 금액 정산은 스튜디오에서 엄마가 직접 신청해요.</li>
+   </ol><p class="lead">규격과 약관은 바뀔 수 있으니 제출 직전에 스튜디오 안내를 한 번 더 확인해 주세요.</p></div>
+   <div class="row"><button class="btn" id="resetAll">새 이모티콘 시작하기</button></div>
+   ${navHTML('처음으로')}</section>`;
+  m.querySelector('[data-next]').onclick=e=>{e.stopImmediatePropagation();go(0)};
+  const prev=async()=>{const src=await mainFrom(state.main),mp=m.querySelector('#mainPrev'),tp=m.querySelector('#tabPrev');
+    [[mp,240,240,10],[tp,96,74,4]].forEach(([el,w,h,p])=>{const c=el.getContext('2d');c.clearRect(0,0,w,h);c.drawImage(fitInto(src,w,h,p),0,0)})};prev();
+  m.querySelector('#mainSel').onchange=e=>{state.main=+e.target.value;save();prev()};
+  [['#mTitle','title'],['#mDesc','desc'],['#mTags','tags']].forEach(([s,k])=>m.querySelector(s).oninput=e=>{state[k]=e.target.value;save()});
+  m.querySelector('#metaAI').onclick=async e=>{const b=e.currentTarget,st=m.querySelector('#metaSt');b.disabled=true;st.textContent='쓰는 중...';
+    try{const r=await sample.json(RULES()+`\n\n네이버 OGQ마켓에 낼 스티커 정보를 써 줘. 캐릭터 ${state.char.name}(${subject()}), 문구: ${state.slots.map(s=>s.caption).join(', ')}. {"title": 15자 이내 이모티콘 이름, "desc": 어른 손님이 읽을 2문장 소개(존댓말), "tags": 명확한 명사 태그 5개 배열}. JSON만.`,{cache:false});
+      state.title=String(r.title||state.title);state.desc=String(r.desc||state.desc);state.tags=Array.isArray(r.tags)?r.tags.map(String).join(', '):state.tags;save();render()}
+    catch(err){st.textContent=aiErr(err);b.disabled=false}};
+  m.querySelector('#zipBtn').onclick=async()=>{const st=m.querySelector('#zipSt'),miss=state.slots.filter(s=>!s.img).length;
+    if(miss){st.textContent=`아직 안 그린 칸이 ${miss}개 있어요. 24개를 다 그려야 제출할 수 있어요.`;return}
+    if(!window.JSZip){st.textContent='파일 묶는 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.';return}
+    if(!canSave()){st.textContent='이 화면에서는 파일 저장이 안 돼요. 링크를 브라우저에서 열어 주세요.';return}
+    st.textContent='만드는 중...';try{const zip=new JSZip(),blob=cv=>new Promise(r=>cv.toBlob(r,'image/png'));
+      for(let i=0;i<24;i++)zip.file(`sticker_${String(i+1).padStart(2,'0')}.png`,await blob(await stickerCanvas(i)));
+      const src=await mainFrom(state.main);zip.file('main_240x240.png',await blob(fitInto(src,240,240,10)));zip.file('tab_96x74.png',await blob(fitInto(src,96,74,4)));
+      zip.file('정보.txt',`이름: ${state.title}\n소개: ${state.desc}\n태그: ${state.tags}\n그림: 지호\n`);
+      const out=await zip.generateAsync({type:'blob'});await saveFile(`${state.char.name||'sticker'}_OGQ.zip`,out);st.textContent='저장했어요! 이제 엄마가 스튜디오에 올리면 돼요.'}
+    catch(e){st.textContent=e?.code==='declined'?'저장을 취소했어요.':'저장하지 못했어요. 다시 눌러 주세요.'}};
+  m.querySelector('#resetAll').onclick=()=>ask('새 이모티콘을 시작할까요?','지금 그린 24개는 모두 지워져요. 먼저 ZIP이나 모아보기를 저장해 두세요.',()=>{state=fresh();save();go(0)});
+}
+
+/* ---------- 공용 ---------- */
+let downloads=null;(async()=>{try{downloads=window.claude?.use?await window.claude.use('downloads'):null}catch(e){}})();
+
+async function saveFile(name,blob){
+  if(downloads){await downloads.save({filename:name,data:blob});return}
+  if(window.claude)throw{code:'unavailable'};
+  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+const canSave=()=>!!downloads||!window.claude;
+let cfFn=null;function ask(t,x,fn){$('#cfTitle').textContent=t;$('#cfText').textContent=x;cfFn=fn;$('#confirmModal').hidden=false}
+$('#cfNo').onclick=()=>{$('#confirmModal').hidden=true};$('#cfYes').onclick=()=>{$('#confirmModal').hidden=true;cfFn&&cfFn();cfFn=null};
+
+/* ---------- 엄마에게 보내기 ---------- */
+function momText(){const c=state.char,d=new Date(),drawn=state.slots.filter(s=>s.img).length,ck=MANUAL.filter(([k])=>state.checks[k]).length;
+  return `💌 [지호의 이모티콘 학교] ${d.getMonth()+1}월 ${d.getDate()}일 보고
+지금 단계: ${state.step+1}. ${STEPS[state.step]}
+주제: ${state.topic||'아직'} · ${subject()}
+캐릭터: ${c.name||'아직'}${c.traits.length?' ('+c.traits.join(', ')+')':''}${c.mark?' · 특징 '+c.mark:''}
+그린 그림: ${drawn} / 24개
+점검표: ${ck} / ${MANUAL.length}개 체크
+${state.title?'이모티콘 이름: '+state.title+'\n':''}
+24개 말: ${state.slots.map((s,i)=>`${i+1}.${s.caption||s.label}${s.img?'✓':''}`).join('  ')}`}
+$('#momBtn').onclick=()=>{$('#momTxt').value=momText();$('#momSt').textContent='';$('#momModal').hidden=false;say(['엄마한테 보낼 글을 만들었어! <b>복사하기</b>를 누르고 카톡이나 문자에 붙여 넣으면 돼.'],'cheer')};
+$('#momCopy').onclick=async()=>{const t=$('#momTxt');try{await navigator.clipboard.writeText(t.value);$('#momSt').textContent='복사했어요! 카톡에 붙여 넣어 보내 주세요.'}catch(e){t.focus();t.select();$('#momSt').textContent='글이 선택됐어요. 길게 눌러 복사해 주세요.'}};
+$('#momClose').onclick=()=>$('#momModal').hidden=true;
+render();
+})();
+</script>
+
+</body></html>
